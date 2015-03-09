@@ -154,7 +154,7 @@ namespace SystemCSharp.Kernel
             return time._value;
         }
 
-        public static bool operator == (SimulationTime left, SimulationTime right)
+        public static bool operator ==(SimulationTime left, SimulationTime right)
         {
             return left._value == right._value;
         }
@@ -206,7 +206,70 @@ namespace SystemCSharp.Kernel
 
         public static double operator /(SimulationTime left, SimulationTime right)
         {
-            return (double)left._value/(double)right._value;
+            return (double)left._value / (double)right._value;
+        }
+
+        public double ToDouble()   // relative to the time resolution
+        {
+            return _value;
+        }
+
+        public double ToDefaultTimeUnits()
+        {
+            SimulationTimeParameters time_params = CurrentSimContext.TimeParameters;
+            return ((double)_value / (double)time_params.DefaultTimeUnit);
+        }
+
+        public double ToSeconds()
+        {
+            SimulationTimeParameters time_params = CurrentSimContext.TimeParameters;
+            return ((double)_value * time_params.TimeResolution * 1e-15);
+        }
+
+        public override string ToString()
+        {
+            UInt64 val = _value;
+            if (val == 0)
+            {
+                return "0 s";
+            }
+            SimulationTimeParameters time_params = CurrentSimContext.TimeParameters;
+            UInt64 tr = (UInt64)(time_params.TimeResolution);
+            int n = 0;
+            while ((tr % 10) == 0)
+            {
+                tr /= 10;
+                n++;
+            }
+
+            while ((val % 10) == 0)
+            {
+                val /= 10;
+                n++;
+            }
+
+            StringBuilder result = new StringBuilder();
+
+            result.Append(val);
+            if (n >= 15)
+            {
+                for (int i = n - 15; i > 0; --i)
+                {
+                    result.Append("0");
+                }
+                result.Append(" s");
+            }
+            else
+            {
+                for (int i = n % 3; i > 0; --i)
+                {
+                    result.Append("0");
+                }
+                result.Append(" ");
+                result.Append(time_units[n / 3]);
+            }
+
+            return result.ToString();
         }
 
 
