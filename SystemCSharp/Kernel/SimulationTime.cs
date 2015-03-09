@@ -226,6 +226,15 @@ namespace SystemCSharp.Kernel
             return ((double)_value * time_params.TimeResolution * 1e-15);
         }
 
+        public override bool Equals(object obj)
+        {
+            SimulationTime els = obj as SimulationTime;
+            if (els == null)
+                return false;
+            else
+                return els._value == _value;
+        }
+
         public override string ToString()
         {
             UInt64 val = _value;

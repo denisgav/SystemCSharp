@@ -68,6 +68,21 @@ namespace SystemCSharp.Kernel
             isRunning = false;
             timeParameters = new SimulationTimeParameters();
         }
+
+        public virtual int AddDeltaEvent(SimulationEvent e)
+        {
+            return 0;
+        }
+
+        public virtual void AddTimedEvent(SimulationTimedEvent e)
+        { }
+
+        private SimulationTime timestamp;
+
+        public virtual SimulationTime Timestamp
+        {
+            get { return timestamp; }
+        }
         
         
         

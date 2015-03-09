@@ -47,8 +47,11 @@
     <Compile Include="Kernel\Attribute.cs" />
     <Compile Include="Kernel\SimulationContext.cs" />
     <Compile Include="Kernel\SimulationEvent.cs" />
+    <Compile Include="Kernel\SimulationMethodProcess.cs" />
     <Compile Include="Kernel\SimulationObject.cs" />
     <Compile Include="Kernel\SimulationObjectManager.cs" />
+    <Compile Include="Kernel\SimulationProcess.cs" />
+    <Compile Include="Kernel\SimulationThreadProcess.cs" />
     <Compile Include="Kernel\SimulationTime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tracing\TraceFile.cs" />
