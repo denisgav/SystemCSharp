@@ -74,6 +74,10 @@ namespace SystemCSharp.Kernel
             return 0;
         }
 
+        public virtual void RemoveDeltaEvent(SimulationEvent e)
+        {
+        }
+
         public virtual void AddTimedEvent(SimulationTimedEvent e)
         { }
 

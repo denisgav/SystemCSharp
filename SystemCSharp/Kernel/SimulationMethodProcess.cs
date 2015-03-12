@@ -10,5 +10,7 @@ namespace SystemCSharp.Kernel
         public SimulationMethodProcess(string name)
             : base(name, false)
         { }
+
+        
     }
 }

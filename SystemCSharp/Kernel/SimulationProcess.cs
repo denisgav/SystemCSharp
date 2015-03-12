@@ -44,7 +44,33 @@ namespace SystemCSharp.Kernel
 
     public class SimulationProcess
     {
+        public static void Wait( SimulationContext context )
+        {}
+
+        public static void Wait( SimulationEvent e, SimulationContext context )
+        {}
+
+        public static void Wait( SimulationEventList el, SimulationContext context )
+        {}
+
+        public static void Wait( SimulationTime time, SimulationContext context )
+        {}
+
+        public static void Wait( SimulationTime time, SimulationEvent e, SimulationContext context )
+        {}
+
+        public static void Wait(SimulationTime time, SimulationEventList el, SimulationContext context)
+        { }
+
         public SimulationProcess(string name, bool is_thread)
         { }
+
+        public virtual void TriggerStatic()
+        { }
+
+        public virtual bool TriggerDynamic(SimulationEvent e)
+        {
+            return true;
+        }
     }
 }

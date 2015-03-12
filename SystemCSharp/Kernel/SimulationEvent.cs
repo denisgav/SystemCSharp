@@ -34,7 +34,7 @@ namespace SystemCSharp.Kernel
 
         public SimulationTimedEvent(SimulationTimedEvent ste)
             : this(ste.simEvent, ste.notifyTime)
-        { }        
+        { }
     }
 
     public class SimulationEvent
@@ -54,17 +54,17 @@ namespace SystemCSharp.Kernel
         }
 
         private List<SimulationThreadProcess> threadsStatic;
-        public virtual List<SimulationThreadProcess> ThreadsStati
+        public virtual List<SimulationThreadProcess> ThreadsStatic
         {
             get { return threadsStatic; }
             set { threadsStatic = value; }
         }
 
-        private List<SimulationThreadProcess> threadDynamic;
-        public virtual List<SimulationThreadProcess> ThreadDynamic
+        private List<SimulationThreadProcess> threadsDynamic;
+        public virtual List<SimulationThreadProcess> ThreadsDynamic
         {
-            get { return threadDynamic; }
-            set { threadDynamic = value; }
+            get { return threadsDynamic; }
+            set { threadsDynamic = value; }
         }
 
         private string name;
@@ -123,7 +123,7 @@ namespace SystemCSharp.Kernel
         {
             get { return deltaEventIndex; }
             set { deltaEventIndex = value; }
-        }       
+        }
 
         public virtual bool IsInHierarchy
         {
@@ -131,10 +131,66 @@ namespace SystemCSharp.Kernel
         }
 
         public virtual void Cancel()
-        { }
+        {
+            switch (notifyType)
+            {
+                case SimulationEventNotifyType.DELTA:
+                    {
+                        simContext.RemoveDeltaEvent(this);
+                    }
+                    break;
+                case SimulationEventNotifyType.TIMED:
+                    {
+                        notifyType = SimulationEventNotifyType.NONE;
+                        timedData = null;
+                    }
+                    break;
+                default:
+                    { }
+                    break;
+            }
+        }
 
         public virtual void Trigger()
-        { }
+        {
+            foreach (SimulationMethodProcess smp in methodsStatic)
+            {
+                smp.TriggerStatic();
+            }
+
+            for (int i = 0; i < methodsDynamic.Count; )
+            {
+
+                bool res = methodsDynamic[i].TriggerDynamic(this);
+                if (res)
+                {
+                    methodsDynamic.RemoveAt(i);
+                }
+                else
+                {
+                    i++;
+                }
+            }
+
+            foreach (SimulationThreadProcess smp in threadsStatic)
+            {
+                smp.TriggerStatic();
+            }
+
+            for (int i = 0; i < threadsDynamic.Count; )
+            {
+
+                bool res = threadsDynamic[i].TriggerDynamic(this);
+                if (res)
+                {
+                    threadsDynamic.RemoveAt(i);
+                }
+                else
+                {
+                    i++;
+                }
+            }
+        }
 
         public virtual void Notify()
         {
@@ -181,5 +237,84 @@ namespace SystemCSharp.Kernel
             timedData = et;
             notifyType = SimulationEventNotifyType.TIMED;
         }
+    }
+
+    public class SimulationEventList : List<SimulationEvent>
+    {
+        private int busy;
+        public virtual bool IsBusy
+        {
+            get { return busy != 0; }
+        }
+
+        private bool autoDelete;
+        public bool AutoDelete
+        {
+            get { return autoDelete; }
+            set { autoDelete = value; }
+        }
+
+        public bool Temporary
+        {
+            get { return autoDelete && !(busy != 0); }
+        }
+
+
+        public virtual void Swap(SimulationEventList that)
+        {
+            if ((IsBusy == true) || (that.IsBusy == true))
+                throw new Exception("Could not swap when some of event lists is busy");
+
+            List<SimulationEvent> data = new List<SimulationEvent>();
+            data.AddRange(this);
+            this.Clear();
+            this.AddRange(that);
+            that.Clear();
+            that.AddRange(data);
+        }
+
+        public virtual void DoAutoDelete()
+        {
+            if (busy != 0)
+            {
+                --busy;
+            }
+            if (busy == 0 && autoDelete)
+            {
+                Clear();
+            }
+        }
+
+        public virtual void AddDynamic(SimulationMethodProcess method)
+        {
+            foreach (SimulationEvent e in this)
+            {
+                e.MethodsDynamic.Add(method);
+            }
+        }
+        public virtual void AddDynamic(SimulationThreadProcess thread)
+        {
+            foreach (SimulationEvent e in this)
+            {
+                e.ThreadsDynamic.Add(thread);
+            }
+        }
+        public virtual void RemoveDynamic(SimulationMethodProcess method, SimulationEvent except)
+        {
+            foreach (SimulationEvent e in this)
+            {
+                if(e != except)
+                    e.MethodsDynamic.Remove(method);
+            }
+        }
+        public virtual void RemoveDynamic(SimulationThreadProcess thread, SimulationEvent except)
+        {
+            foreach (SimulationEvent e in this)
+            {
+                if (e != except)
+                    e.ThreadsDynamic.Remove(thread);
+            }
+        }
+
     }
 }
