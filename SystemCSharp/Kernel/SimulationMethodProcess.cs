@@ -7,10 +7,14 @@ namespace SystemCSharp.Kernel
 {
     public class SimulationMethodProcess : SimulationProcess
     {
-        public SimulationMethodProcess(string name)
+        public SimulationMethodProcess(string name, Func<object, int> func)
             : base(name, false)
         { }
 
+        public virtual string Kind
+        {
+            get { return "SimulationMethodProcess"; }
+        }
         
     }
 }

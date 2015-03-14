@@ -40,14 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fibers\Fiber.cs" />
-    <Compile Include="Fibers\FiberScheduler.cs" />
-    <Compile Include="Fibers\FiberSchedulingThread.cs" />
-    <Compile Include="Fibers\FiberStatus.cs" />
     <Compile Include="Kernel\Attribute.cs" />
     <Compile Include="Kernel\SimulationContext.cs" />
     <Compile Include="Kernel\SimulationEvent.cs" />
     <Compile Include="Kernel\SimulationMethodProcess.cs" />
+    <Compile Include="Kernel\SimulationModule.cs" />
     <Compile Include="Kernel\SimulationObject.cs" />
     <Compile Include="Kernel\SimulationObjectManager.cs" />
     <Compile Include="Kernel\SimulationProcess.cs" />

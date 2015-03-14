@@ -46,6 +46,17 @@ namespace SystemCSharp.Kernel
             }
         }
 
+        private static SimulationTime maxTime;
+        public static SimulationTime MaxTime
+        {
+            get
+            {
+                if (maxTime == null)
+                    maxTime = FromUInt64(UInt64.MaxValue);
+                return maxTime;
+            }
+        }
+
         private UInt64 _value;
 
         private SimulationContext currentSimContext;

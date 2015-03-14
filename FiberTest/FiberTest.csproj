@@ -43,6 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Fibers\Fiber.cs" />
+    <Compile Include="Fibers\FiberScheduler.cs" />
+    <Compile Include="Fibers\FiberSchedulingThread.cs" />
+    <Compile Include="Fibers\FiberStatus.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
