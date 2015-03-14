@@ -13,7 +13,7 @@ namespace SystemCSharp.Kernel
         PhaseNotify
     }
 
-    public enum SimulationStpMode
+    public enum SimulationStopMode
     {          // sc_stop modes:
         STOP_FINISH_DELTA,
         STOP_IMMEDIATE
@@ -35,17 +35,29 @@ namespace SystemCSharp.Kernel
 
     public class SimulaionCurrentProcessInfo
     {
-        SimulationProcess process_handle;
-        SimulationCurrentProcessKind kind;
+        private SimulationProcess processHandle;
+        public virtual SimulationProcess ProcessHandle
+        {
+            get { return processHandle; }
+            set { processHandle = value; }
+        }
+
+        private SimulationCurrentProcessKind kind;
+        public SimulationCurrentProcessKind Kind
+        {
+            get { return kind; }
+            set { kind = value; }
+        }
+
         public SimulaionCurrentProcessInfo()
         {
-            process_handle = null;
+            processHandle = null;
             kind = SimulationCurrentProcessKind.NO_PROC;
         }
 
         public SimulaionCurrentProcessInfo(SimulationProcess process_handle, SimulationCurrentProcessKind kind)
         {
-            this.process_handle = process_handle;
+            this.processHandle = process_handle;
             this.kind = kind;
         }
     };
@@ -117,6 +129,25 @@ namespace SystemCSharp.Kernel
         }
 
 
+        public SimulationContext()
+        {
+            moduleRegistry = new SimulationModuleRegistry(this);
+            timeParameters = new SimulationTimeParameters();
+            timestamp = SimulationTime.ZeroTime;
+            currentTime = SimulationTime.ZeroTime;
+
+            simObjectManager = new SimulationObjectManager();
+            childObjects = new List<SimulationObject>();
+            childEvents = new List<SimulationEvent>();
+            isRunning = false;
+            timeParameters = new SimulationTimeParameters();
+            currentProcInfo = new SimulaionCurrentProcessInfo();
+            runnable = new SimulationRunnable();
+
+            deltaEvents = new List<SimulationEvent>();
+            timedEvents = new List<SimulationTimedEvent>();
+        }
+
         public const char HIERARCHY_CHAR = '.';
 
         private SimulationTimeParameters timeParameters;
@@ -136,6 +167,14 @@ namespace SystemCSharp.Kernel
                 return globalSimContext;
             }
         }
+
+        private SimulationModuleRegistry moduleRegistry;
+        public SimulationModuleRegistry ModuleRegistry
+        {
+            get { return moduleRegistry; }
+            set { moduleRegistry = value; }
+        }
+
 
         private bool isRunning;
         public bool IsRunning
@@ -170,15 +209,6 @@ namespace SystemCSharp.Kernel
             return simObjectManager.HierarchyCurr();
         }
 
-        public SimulationContext()
-        {
-            simObjectManager = new SimulationObjectManager();
-            childObjects = new List<SimulationObject>();
-            childEvents = new List<SimulationEvent>();
-            isRunning = false;
-            timeParameters = new SimulationTimeParameters();
-        }
-
         public virtual int AddDeltaEvent(SimulationEvent e)
         {
             throw new NotImplementedException();
@@ -189,11 +219,20 @@ namespace SystemCSharp.Kernel
             throw new NotImplementedException();
         }
 
-        public UInt64 DeltaCount
+        private UInt64 changeStamp = 0;
+        public virtual UInt64 ChangeStamp
+        {
+            get { return changeStamp; }
+            set { changeStamp = value; }
+        }
+
+
+        private UInt64 deltaCount = 0;
+        public virtual UInt64 DeltaCount
         {
             get
             {
-                throw new NotImplementedException();
+                return deltaCount;
             }
         }
 
@@ -212,6 +251,20 @@ namespace SystemCSharp.Kernel
         public virtual SimulationTime CurrentTime
         {
             get { return currentTime; }
+        }
+
+        private List<SimulationEvent> deltaEvents;
+        public List<SimulationEvent> DeltaEvents
+        {
+            get { return deltaEvents; }
+            set { deltaEvents = value; }
+        }
+
+        private List<SimulationTimedEvent> timedEvents;
+        public List<SimulationTimedEvent> TimedEvents
+        {
+            get { return timedEvents; }
+            set { timedEvents = value; }
         }
 
 
@@ -236,12 +289,64 @@ namespace SystemCSharp.Kernel
             set { internalError = value; }
         }
 
-        private bool forcedStop;
+        private bool forcedStop = false;
         public virtual bool ForcedStop
         {
             get { return forcedStop; }
             set { forcedStop = value; }
         }
+
+        private SimulationStopMode stopMode;
+        public SimulationStopMode StopMode
+        {
+            get { return stopMode; }
+            set { stopMode = value; }
+        }
+
+
+        private SimulaionCurrentProcessInfo currentProcInfo;
+
+        public SimulaionCurrentProcessInfo CurrentProcInfo
+        {
+            get { return currentProcInfo; }
+            set { currentProcInfo = value; }
+        }
+
+        private bool writeCheckEnabled;
+
+        public virtual bool WriteCheckEnabled
+        {
+            get { return writeCheckEnabled; }
+            set { writeCheckEnabled = value; }
+        }
+
+
+        private SimulationObject currentWriter;
+
+        public SimulationObject CurrentWritter
+        {
+            get { return currentWriter; }
+            set { currentWriter = value; }
+        }
+
+
+
+        private SimulationExecutionPhase executionPhase;
+        public virtual SimulationExecutionPhase ExecutionPhase
+        {
+            get { return executionPhase; }
+            set { executionPhase = value; }
+        }
+
+        private SimulationRunnable runnable;
+
+        public virtual SimulationRunnable Runnable
+        {
+            get { return runnable; }
+            set { runnable = value; }
+        }
+
+
 
         public virtual int SimulationStatus
         {
@@ -259,11 +364,89 @@ namespace SystemCSharp.Kernel
             }
         }
 
-        private bool isPaused;
+        private bool isPaused = false;
         public virtual bool IsPaused
         {
             get { return isPaused; }
             set { isPaused = value; }
+        }
+        public virtual void PushRunnableMethod(SimulationMethodProcess method_h)
+        {
+            runnable.PushBackMethod(method_h);
+        }
+
+        public virtual void PushRunnableMethodFront(SimulationMethodProcess method_h)
+        {
+            runnable.PushFrontMethod(method_h);
+        }
+
+        public virtual void PushRunnableThread(SimulationThreadProcess thread_h)
+        {
+            runnable.PushBackThread(thread_h);
+        }
+
+        public virtual void PushRunnableThreadFront(SimulationThreadProcess thread_h)
+        {
+            runnable.PushFrontThread(thread_h);
+        }
+
+
+        public virtual SimulationMethodProcess PopRunnableMethod()
+        {
+            SimulationMethodProcess method_h = runnable.PopMethod();
+            if (method_h == null)
+            {
+                ResetCurrProc();
+                return null;
+            }
+            SetCurrProc(method_h);
+            return method_h;
+        }
+
+        public virtual SimulationThreadProcess PopRunnableThread()
+        {
+            SimulationThreadProcess thread_h = runnable.PopThread();
+            if (thread_h == null)
+            {
+                ResetCurrProc();
+                return null;
+            }
+            SetCurrProc(thread_h);
+            return thread_h;
+        }
+
+        public virtual void SetCurrProc(SimulationProcess process_h)
+        {
+            currentProcInfo.ProcessHandle = process_h;
+            currentProcInfo.Kind = process_h.ProcessKind;
+            currentWriter = writeCheckEnabled ? process_h : null;
+        }
+
+        public virtual void ResetCurrProc()
+        {
+            currentProcInfo.ProcessHandle = null;
+            currentProcInfo.Kind = SimulationCurrentProcessKind.NO_PROC;
+            currentWriter = null;
+        }
+
+        public virtual void ExecuteMethodNext(SimulationMethodProcess method_h)
+        {
+            runnable.ExecuteMethodNext(method_h);
+        }
+
+        public virtual void ExecuteThreadNext(SimulationThreadProcess thread_h)
+        {
+            runnable.ExecuteThreadNext(thread_h);
+        }
+
+        public virtual void RemoveRunnableMethod(SimulationMethodProcess method_h)
+        {
+            runnable.RemoveMethod(method_h);
+        }
+
+        public virtual void RemoveRunnableThread(SimulationThreadProcess thread_h)
+        {
+            runnable.RemoveThread(thread_h);
         }
 
 
@@ -284,7 +467,8 @@ namespace SystemCSharp.Kernel
 
         public virtual void Elaborate()
         {
-            throw new NotImplementedException();
+            foreach (SimulationModule m in moduleRegistry)
+                m.ElaborationDone();
         }
 
         public virtual void PrepareToSimulation()
@@ -307,9 +491,112 @@ namespace SystemCSharp.Kernel
             throw new NotImplementedException();
         }
 
-        public virtual void Crunch()
+        public virtual void Crunch(bool once = false)
         {
-            throw new NotImplementedException();
+            while (true)
+            {
+
+                // EVALUATE PHASE
+
+                executionPhase = SimulationExecutionPhase.PhaseEvaluate;
+                bool empty_eval_phase = true;
+                while (true)
+                {
+
+                    // execute method processes
+
+                    runnable.ToggleMethods();
+                    SimulationMethodProcess method_h = PopRunnableMethod();
+                    while (method_h != null)
+                    {
+                        empty_eval_phase = false;
+                        if (!method_h.RunProcess()) { ResetCurrProc(); return; }
+                        method_h = PopRunnableMethod();
+                    }
+
+                    // execute (c)thread processes
+
+                    runnable.ToggleMethods();
+                    SimulationThreadProcess thread_h = PopRunnableThread();
+                    while (thread_h != null)
+                    {
+                        thread_h = PopRunnableThread();
+                    }
+
+                    /*
+                    if( thread_h != null ) {
+                        empty_eval_phase = false;
+                    m_cor_pkg->yield( thread_h->m_cor_p );
+                    }
+                    if( m_error ) {
+                    goto out;
+                    }
+                    */
+                    // check for call(s) to sc_stop
+                    if (forcedStop)
+                    {
+                        if (stopMode == SimulationStopMode.STOP_IMMEDIATE) { ResetCurrProc(); return; }
+                    }
+
+                    // no more runnable processes
+
+                    if (runnable.IsEmpty)
+                    {
+                        break;
+                    }
+                }
+
+                // will work.
+
+                executionPhase = SimulationExecutionPhase.PhaseUpdate;
+                if (!empty_eval_phase)
+                {
+                    //	    SC_DO_PHASE_CALLBACK_(evaluation_done);
+                    changeStamp++;
+                    deltaCount++;
+                }
+                //m_prim_channel_registry->perform_update();
+                //SC_DO_PHASE_CALLBACK_(update_done);
+                executionPhase = SimulationExecutionPhase.PhaseNotify;
+
+
+                // check for call(s) to sc_stop
+                if (forcedStop)
+                {
+                    break;
+                }
+
+
+                // NOTIFICATION PHASE:
+                //
+                // Process delta notifications which will queue processes for 
+                // subsequent execution.
+
+                int size = deltaEvents.Count;
+                if (size != 0)
+                {
+                    foreach (SimulationEvent e in deltaEvents)
+                    {
+                        e.Trigger();
+                    }
+                    deltaEvents.Clear();
+                }
+
+                if (runnable.IsEmpty)
+                {
+                    // no more runnable processes
+                    break;
+                }
+
+                // if sc_pause() was called we are done.
+
+                if (isPaused) break;
+
+                // IF ONLY DOING ONE CYCLE, WE ARE DONE. OTHERWISE EXECUTE NEW CALLBACKS
+
+                if (once) break;
+            }
         }
+
     }
 }

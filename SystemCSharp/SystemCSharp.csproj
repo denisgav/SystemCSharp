@@ -45,9 +45,12 @@
     <Compile Include="Kernel\SimulationEvent.cs" />
     <Compile Include="Kernel\SimulationMethodProcess.cs" />
     <Compile Include="Kernel\SimulationModule.cs" />
+    <Compile Include="Kernel\SimulationModuleRegistry.cs" />
     <Compile Include="Kernel\SimulationObject.cs" />
     <Compile Include="Kernel\SimulationObjectManager.cs" />
     <Compile Include="Kernel\SimulationProcess.cs" />
+    <Compile Include="Kernel\SimulationRunnable.cs" />
+    <Compile Include="Kernel\SimulationSpawnOptions.cs" />
     <Compile Include="Kernel\SimulationThreadProcess.cs" />
     <Compile Include="Kernel\SimulationTime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

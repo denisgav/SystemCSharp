@@ -167,12 +167,24 @@ namespace SystemCSharp.Kernel
 
         public static bool operator ==(SimulationTime left, SimulationTime right)
         {
+            // If both are null, or both are same instance, return true.
+            if (System.Object.ReferenceEquals(left, right))
+            {
+                return true;
+            }
+
+            // If one is null, but not both, return false.
+            if (((object)left == null) || ((object)right == null))
+            {
+                return false;
+            }
+
             return left._value == right._value;
         }
 
         public static bool operator !=(SimulationTime left, SimulationTime right)
         {
-            return left._value != right._value;
+            return !(left == right);
         }
 
         public static bool operator <(SimulationTime left, SimulationTime right)

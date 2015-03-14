@@ -42,35 +42,52 @@ namespace SystemCSharp.Kernel
         AND_LIST_TIMEOUT
     }
 
-    public class SimulationProcess
+    public class SimulationProcess : SimulationObject
     {
         public static void Wait( SimulationContext context )
-        {}
+        { throw new NotImplementedException(); }
 
         public static void Wait( SimulationEvent e, SimulationContext context )
-        {}
+        { throw new NotImplementedException(); }
 
         public static void Wait( SimulationEventList el, SimulationContext context )
-        {}
+        { throw new NotImplementedException(); }
 
         public static void Wait( SimulationTime time, SimulationContext context )
-        {}
+        { throw new NotImplementedException(); }
 
         public static void Wait( SimulationTime time, SimulationEvent e, SimulationContext context )
-        {}
+        { throw new NotImplementedException(); }
 
         public static void Wait(SimulationTime time, SimulationEventList el, SimulationContext context)
-        { }
-
-        public SimulationProcess(string name, bool is_thread)
-        { }
+        { throw new NotImplementedException(); }
 
         public virtual void TriggerStatic()
-        { }
+        { throw new NotImplementedException(); }
 
         public virtual bool TriggerDynamic(SimulationEvent e)
+        { throw new NotImplementedException(); }
+
+        public virtual string Kind
         {
-            return true;
+            get { return "SimulationProcess"; }
         }
+
+        private SimulationCurrentProcessKind processKind;
+        public virtual SimulationCurrentProcessKind ProcessKind
+        {
+            get { return processKind; }
+        }
+
+        public virtual bool RunProcess()
+        {
+            throw new NotImplementedException();
+        }
+        
+
+        public SimulationProcess(string name, Func<object, int> func, SimulationSpawnOptions spawnOptions)
+        { }
+
+        protected SimulationProcess m_runnable_p;      // sc_runnable link
     }
 }

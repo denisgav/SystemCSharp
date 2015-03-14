@@ -23,14 +23,15 @@ namespace SCS_Example
             this.period = period;
             //SystemCsharp.SC.Register(parent, this, instance_name);
             //clk = new SystemCsharp.sc_out<bool>(this); // this, "clk");
-            var s = new SystemCSharp.Kernel.SimulationMethodProcess("clkgen", step);
+            var s = new SystemCSharp.Kernel.SimulationMethodProcess("clkgen", step, null);
             //s.sensitive(clk);
         }
 
-        public override void EndOfElaboration(int code)
+        public override void ElaborationDone()
         {
             //clk.Write(1 - (clk.Read() & 1L), period / 2L);
         }
+
     }
 
     class Program
