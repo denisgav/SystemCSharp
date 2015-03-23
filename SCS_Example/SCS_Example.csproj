@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SystemCSharp\SystemCSharp.csproj">
-      <Project>{BCBDBD68-8DDA-446D-9270-F98F3C8E8C82}</Project>
+      <Project>{2078EEAA-700C-45EC-BAC3-335348DF3E9A}</Project>
       <Name>SystemCSharp</Name>
     </ProjectReference>
   </ItemGroup>

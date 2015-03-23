@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{BCBDBD68-8DDA-446D-9270-F98F3C8E8C82}</ProjectGuid>
+    <ProjectGuid>{2078EEAA-700C-45EC-BAC3-335348DF3E9A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SystemCSharp</RootNamespace>
@@ -40,23 +40,48 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Kernel\Attribute.cs" />
-    <Compile Include="Kernel\SimulationContext.cs" />
-    <Compile Include="Kernel\SimulationEvent.cs" />
-    <Compile Include="Kernel\SimulationMethodProcess.cs" />
-    <Compile Include="Kernel\SimulationModule.cs" />
-    <Compile Include="Kernel\SimulationModuleRegistry.cs" />
-    <Compile Include="Kernel\SimulationObject.cs" />
-    <Compile Include="Kernel\SimulationObjectManager.cs" />
-    <Compile Include="Kernel\SimulationProcess.cs" />
-    <Compile Include="Kernel\SimulationRunnable.cs" />
-    <Compile Include="Kernel\SimulationSpawnOptions.cs" />
-    <Compile Include="Kernel\SimulationThreadProcess.cs" />
-    <Compile Include="Kernel\SimulationTime.cs" />
+    <Compile Include="datatypes\bit\sc_bit.cs" />
+    <Compile Include="datatypes\bit\sc_logic.cs" />
+    <Compile Include="datatypes\misc\sc_value_base.cs" />
+    <Compile Include="kernel\sc_attribute.cs" />
+    <Compile Include="kernel\sc_cor.cs" />
+    <Compile Include="kernel\sc_cthread_process.cs" />
+    <Compile Include="kernel\sc_event.cs" />
+    <Compile Include="kernel\sc_except.cs" />
+    <Compile Include="kernel\sc_join.cs" />
+    <Compile Include="kernel\sc_method_process.cs" />
+    <Compile Include="kernel\sc_module.cs" />
+    <Compile Include="kernel\sc_module_name.cs" />
+    <Compile Include="kernel\sc_module_registry.cs" />
+    <Compile Include="kernel\sc_name_gen.cs" />
+    <Compile Include="kernel\sc_object.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="kernel\sc_object_manager.cs" />
+    <Compile Include="kernel\sc_phase_callback_registry.cs" />
+    <Compile Include="kernel\sc_process.cs" />
+    <Compile Include="kernel\sc_process_handle.cs" />
+    <Compile Include="kernel\sc_runnable.cs" />
+    <Compile Include="kernel\sc_simcontext.cs" />
+    <Compile Include="kernel\sc_spawn_options.cs" />
+    <Compile Include="kernel\sc_status.cs" />
+    <Compile Include="kernel\sc_thread_process.cs" />
+    <Compile Include="kernel\sc_time.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="kernel\sc_ver.cs" />
+    <Compile Include="kernel\sc_wait.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tracing\TraceFile.cs" />
+    <Compile Include="utils\sc_report.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="utils\sc_report_handler.cs" />
+    <Compile Include="utils\sc_stop_here.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="datatypes\fx\" />
+    <Folder Include="datatypes\int\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
