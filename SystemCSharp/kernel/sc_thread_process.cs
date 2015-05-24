@@ -749,6 +749,8 @@ namespace sc_core
             sc_simcontext simc_p = sc_simcontext.sc_get_curr_simcontext();
             sc_thread_process thread_h = (arg) as sc_thread_process;
 
+            simc_p.set_curr_proc(thread_h);
+
             // PROCESS THE THREAD AND PROCESS ANY EXCEPTIONS THAT ARE THROWN:
 
             while (true)

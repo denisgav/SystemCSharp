@@ -72,7 +72,7 @@ namespace SCS_Example
             Thread t = new Thread(Test);
             t.Start();
             t.Join();
-            
+            Console.ReadKey();
         }
 
         public static void Test(object o)

@@ -89,11 +89,11 @@ namespace sc_core
             set { activeCoroutine = value; }
         }
 
-        private static Mutex mutex;
-        public static Mutex Mutex
+        private static Mutex mainMutex;
+        public static Mutex MainMutex
         {
-            get { return mutex; }
-            set { mutex = value; }
+            get { return mainMutex; }
+            set { mainMutex = value; }
         }
 
         private static Thread mainThread;
@@ -126,7 +126,7 @@ namespace sc_core
             // initialize the current coroutine
             if (++instanceCount == 1)
             {
-                mutex = new Mutex();
+                mainMutex = new Mutex();
                 Debug.Assert(activeCoroutine == null);
                 mainCor = new sc_cor();
                 mainCor.CorPkg = this;
@@ -147,10 +147,10 @@ namespace sc_core
         {
             sc_cor cor = o as sc_cor;
 
-            mutex.WaitOne();
-            mutex.ReleaseMutex();
+            mainMutex.WaitOne();
             cor.ThreadFn(cor.FunctionCallArg);
-        }
+            mainMutex.ReleaseMutex();
+         }
 
         // create a new coroutine
         public virtual sc_cor create(uint stack_size, ParameterizedThreadStart fn, object o)
@@ -183,10 +183,11 @@ namespace sc_core
             // This scheme results in the newly created thread being dormant before
             // the main thread continues execution.
 
-            mutex.WaitOne();
+            mainMutex.WaitOne();
             cor_p.Thread = thread;
             thread.Start(cor_p);
-            mutex.ReleaseMutex();
+            mainMutex.ReleaseMutex();
+            
             return cor_p;
         }
 
@@ -196,14 +197,12 @@ namespace sc_core
             sc_cor from_p = activeCoroutine;
             sc_cor to_p = next_cor;
 
-            if ((to_p != from_p) /*&& (from_p != mainCor) && (to_p != mainCor)*/)
+            if (to_p != from_p)
             {
                 to_p.Mutex.WaitOne();
                 from_p.Mutex.WaitOne();
-                from_p.Mutex.ReleaseMutex();
                 to_p.Mutex.ReleaseMutex();
-                if (from_p != mainCor)
-                    from_p.Mutex.ReleaseMutex();
+                from_p.Mutex.ReleaseMutex();
             }
 
             activeCoroutine = from_p; // When we come out of wait make ourselves active.
@@ -212,8 +211,10 @@ namespace sc_core
         // abort the current coroutine (and resume the next coroutine)
         public virtual void abort(sc_cor next_cor)
         {
-            next_cor.Mutex.WaitOne();
-            next_cor.Mutex.ReleaseMutex();
+            //next_cor.Mutex.WaitOne();
+            //next_cor.Mutex.ReleaseMutex();
+            next_cor.Thread.Abort();
+            next_cor.Dispose();
         }
 
         // get the main coroutine
