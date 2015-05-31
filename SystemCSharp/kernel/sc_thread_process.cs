@@ -353,7 +353,7 @@ namespace sc_core
         }
         public void prepare_for_simulation()
         {
-            m_cor_p = simcontext().cor_pkg().create(m_stack_size, sc_thread_process.sc_thread_cor_fn, this);
+            m_cor_p = simcontext().cor_pkg().create(m_stack_size, sc_thread_process.sc_thread_cor_fn, this, this);
             m_cor_p.stack_protect(true);
         }
         public override void resume_process(sc_descendant_inclusion_info descendants)
@@ -748,8 +748,6 @@ namespace sc_core
         {
             sc_simcontext simc_p = sc_simcontext.sc_get_curr_simcontext();
             sc_thread_process thread_h = (arg) as sc_thread_process;
-
-            simc_p.set_curr_proc(thread_h);
 
             // PROCESS THE THREAD AND PROCESS ANY EXCEPTIONS THAT ARE THROWN:
 

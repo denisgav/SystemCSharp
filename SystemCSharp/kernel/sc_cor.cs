@@ -24,8 +24,9 @@ namespace sc_core
 {
     public class sc_cor : IDisposable
     {
-        public sc_cor()
+        public sc_cor(sc_process_b parent)
         {
+            this.parent = parent;
         }
 
         // destructor
@@ -52,13 +53,6 @@ namespace sc_core
             set { functionCallArg = value; }
         }
 
-        private Mutex mutex;
-        public Mutex Mutex
-        {
-            get { return mutex; }
-            set { mutex = value; }
-        }
-
         private sc_cor_pkg corPkg;
         public sc_cor_pkg CorPkg
         {
@@ -66,12 +60,28 @@ namespace sc_core
             set { corPkg = value; }
         }
 
+        private AutoResetEvent autoEvent;
+        public AutoResetEvent AutoEvent
+        {
+            get { return autoEvent; }
+            set { autoEvent = value; }
+        }
+
+
         private Thread thread;
         public Thread Thread
         {
             get { return thread; }
             set { thread = value; }
         }
+
+        private sc_process_b parent;
+        public sc_process_b Parent
+        {
+            get { return parent; }
+            set { parent = value; }
+        }
+
     }
 
     // ----------------------------------------------------------------------------
@@ -89,19 +99,20 @@ namespace sc_core
             set { activeCoroutine = value; }
         }
 
-        private static Mutex mainMutex;
-        public static Mutex MainMutex
-        {
-            get { return mainMutex; }
-            set { mainMutex = value; }
-        }
-
         private static Thread mainThread;
         public static Thread MainThread
         {
             get { return mainThread; }
             set { mainThread = value; }
         }
+
+        private AutoResetEvent mainAutoEvent;
+        public AutoResetEvent MainAutEvent
+        {
+            get { return mainAutoEvent; }
+            set { mainAutoEvent = value; }
+        }
+
 
         private static sc_cor mainCor;
         public static sc_cor MainCor
@@ -126,15 +137,18 @@ namespace sc_core
             // initialize the current coroutine
             if (++instanceCount == 1)
             {
-                mainMutex = new Mutex();
                 Debug.Assert(activeCoroutine == null);
-                mainCor = new sc_cor();
+                mainCor = new sc_cor(null);
                 mainCor.CorPkg = this;
-                mainCor.Mutex = new Mutex();
                 activeCoroutine = mainCor;
 
+                
+                mainAutoEvent = new AutoResetEvent(true);
                 mainThread = System.Threading.Thread.CurrentThread;
                 mainCor.Thread = mainThread;
+                mainCor.AutoEvent = mainAutoEvent;
+
+                m_simc.set_curr_proc(mainCor.Parent);
             }
         }
 
@@ -147,23 +161,30 @@ namespace sc_core
         {
             sc_cor cor = o as sc_cor;
 
-            mainMutex.WaitOne();
+            lock (mainCor)
+            {
+                cor.AutoEvent.Reset();
+            }
+            cor.AutoEvent.WaitOne();
+            lock (mainCor)
+            {
+                cor.AutoEvent.Reset();
+                m_simc.set_curr_proc(cor.Parent);
+            }
             cor.ThreadFn(cor.FunctionCallArg);
-            mainMutex.ReleaseMutex();
-         }
+        }
 
         // create a new coroutine
-        public virtual sc_cor create(uint stack_size, ParameterizedThreadStart fn, object o)
+        public virtual sc_cor create(uint stack_size, ParameterizedThreadStart fn, object o, sc_process_b parent)
         {
-            sc_cor cor_p = new sc_cor();
+            sc_cor cor_p = new sc_cor(parent);
 
             // INITIALIZE OBJECT'S FIELDS FROM ARGUMENT LIST:
 
             cor_p.CorPkg = this;
             cor_p.ThreadFn = fn;
             cor_p.FunctionCallArg = o;
-            cor_p.Mutex = new Mutex();
-
+            cor_p.AutoEvent = new AutoResetEvent(true);
 
             // SET UP THREAD CREATION ATTRIBUTES:
             //
@@ -183,11 +204,9 @@ namespace sc_core
             // This scheme results in the newly created thread being dormant before
             // the main thread continues execution.
 
-            mainMutex.WaitOne();
             cor_p.Thread = thread;
             thread.Start(cor_p);
-            mainMutex.ReleaseMutex();
-            
+
             return cor_p;
         }
 
@@ -197,15 +216,29 @@ namespace sc_core
             sc_cor from_p = activeCoroutine;
             sc_cor to_p = next_cor;
 
+            Console.WriteLine("Switch from {0} to {1}", (from_p.Parent != null) ? from_p.Parent.name() : "NULL", (to_p.Parent != null) ? to_p.Parent.name() : "NULL");
+
             if (to_p != from_p)
             {
-                to_p.Mutex.WaitOne();
-                from_p.Mutex.WaitOne();
-                to_p.Mutex.ReleaseMutex();
-                from_p.Mutex.ReleaseMutex();
+                lock (mainCor)
+                {
+                    m_simc.set_curr_proc(to_p.Parent);
+                    activeCoroutine = to_p; // When we come out of wait make ourselves active.
+                    from_p.AutoEvent.Reset();
+                    to_p.AutoEvent.Set();
+                }
+                Console.WriteLine("From {0} wait one", (from_p.Parent != null) ? from_p.Parent.name() : "NULL");
+                from_p.AutoEvent.WaitOne();
+                Console.WriteLine("From {0} wait done", (from_p.Parent != null) ? from_p.Parent.name() : "NULL");
             }
 
-            activeCoroutine = from_p; // When we come out of wait make ourselves active.
+            lock (mainCor)
+            {
+                m_simc.set_curr_proc(from_p.Parent);
+                activeCoroutine = from_p; // When we come out of wait make ourselves active.
+            }
+
+            Console.WriteLine("Switch from {0} to {1} Done.", (from_p.Parent != null) ? from_p.Parent.name() : "NULL", (to_p.Parent != null) ? to_p.Parent.name() : "NULL");
         }
 
         // abort the current coroutine (and resume the next coroutine)
@@ -213,8 +246,10 @@ namespace sc_core
         {
             //next_cor.Mutex.WaitOne();
             //next_cor.Mutex.ReleaseMutex();
-            next_cor.Thread.Abort();
-            next_cor.Dispose();
+            Console.WriteLine("Thread abort:", (next_cor.Parent != null) ? next_cor.Parent.name() : "NULL");
+            next_cor.AutoEvent.Set();
+            //next_cor.Thread.Abort();
+            //next_cor.Dispose();
         }
 
         // get the main coroutine

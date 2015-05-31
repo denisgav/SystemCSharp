@@ -497,19 +497,21 @@ namespace sc_core
 
             // trigger the dynamic sensitive threads
 
-            if ((m_threads_dynamic.Count) != 0)
+
+            for (int i = 0; i < m_threads_dynamic.Count; )
             {
-                for (int i = 0; i < m_threads_dynamic.Count; )
+                sc_thread_process p = m_threads_dynamic[i];
+                if (p.trigger_dynamic(this))
                 {
-                    sc_thread_process p = m_threads_dynamic[i];
-                    if (p.trigger_dynamic(this))
+                    if (m_threads_dynamic.Count != 0)
                     {
                         m_threads_dynamic.RemoveAt(i);
                     }
-                    else
-                        i++;
                 }
+                else
+                    i++;
             }
+
 
             m_notify_type = notify_t.NONE;
             m_delta_event_index = -1;

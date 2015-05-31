@@ -72,7 +72,7 @@ namespace sc_core
         public void set_curr_proc(sc_process_b process_h)
         {
             m_curr_proc_info.process_handle = process_h;
-            m_curr_proc_info.kind = process_h.proc_kind();
+            m_curr_proc_info.kind = (process_h != null)?process_h.proc_kind() : sc_curr_proc_kind.SC_NO_PROC_;
             m_current_writer = m_write_check ? process_h : null;
         }
         public void execute_method_next(sc_method_process method_h)
@@ -475,7 +475,8 @@ namespace sc_core
 
                     do
                     {
-                        sc_event_timed et = m_timed_events[m_timed_events.Count - 1];
+                        sc_event_timed et = m_timed_events[0];
+                        m_timed_events.RemoveAt(0);
                         sc_event e = et.Event();
                         /*
                         if (et != null)
@@ -1145,13 +1146,13 @@ namespace sc_core
         {
             while (m_timed_events.Count != 0)
             {
-                sc_event_timed et = m_timed_events[m_timed_events.Count - 1];
+                sc_event_timed et = m_timed_events[0];
                 if (et.Event() != null)
                 {
                     result = et.notify_time();
                     return true;
                 }
-                m_timed_events.RemoveAt(m_timed_events.Count - 1);
+                m_timed_events.RemoveAt(0);
             }
             result = null;
             return false;

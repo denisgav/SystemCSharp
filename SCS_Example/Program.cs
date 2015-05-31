@@ -40,6 +40,25 @@ namespace SCS_Example
                 sc_wait.wait(10, sc_time_unit.SC_US);
                 Console.WriteLine("my_thread1_step wait 10 us done");
                 Console.WriteLine("my_thread1_step Current time {0}", sc_simcontext.sc_time_stamp());
+                Console.WriteLine("my_thread1_step done");
+            }
+        }
+
+        public class my_thread2 : sc_process_call_base
+        {
+            public override void invoke(sc_process_host host_p)
+            {
+                step();
+                base.invoke(host_p);
+            }
+            void step()
+            {
+                Console.WriteLine("my_thread2_step");
+                Console.WriteLine("my_thread2_step wait 15 us");
+                sc_wait.wait(15, sc_time_unit.SC_US);
+                Console.WriteLine("my_thread2_step wait 15 us done");
+                Console.WriteLine("my_thread2_step Current time {0}", sc_simcontext.sc_time_stamp());
+                Console.WriteLine("my_thread2_step done");
             }
         }
 
@@ -51,8 +70,9 @@ namespace SCS_Example
             this.period = period;
             //SystemCsharp.SC.Register(parent, this, instance_name);
             //clk = new SystemCsharp.sc_out<bool>(this); // this, "clk");
-            sc_process_handle s1 = sc_simcontext.sc_get_curr_simcontext().create_method_process("clkgen1", false, new my_process1(), null, null);
+            //sc_process_handle s1 = sc_simcontext.sc_get_curr_simcontext().create_method_process("clkgen1", false, new my_process1(), null, null);
             sc_process_handle s2 = sc_simcontext.sc_get_curr_simcontext().create_thread_process("clkgen2", false, new my_thread1(), null, null);
+            sc_process_handle s3 = sc_simcontext.sc_get_curr_simcontext().create_thread_process("clkgen3", false, new my_thread2(), null, null);
             // = new sc_method_process("clkgen", false, new my_process1(), null, null);
             //s.sensitive(clk);
         }
@@ -79,11 +99,9 @@ namespace SCS_Example
         {
             clkgen clkgen1 = new clkgen(null, "clkgen1", 100);
             Console.WriteLine("Starting 1");
-            sc_simcontext.sc_start(100, sc_time_unit.SC_US);
+            sc_simcontext.sc_start(10000, sc_time_unit.SC_US);
             Console.WriteLine("Starting 2");
-
-
-            //sc_simcontext.sc_start(100, sc_time_unit.SC_US);
+            sc_simcontext.sc_start(10000, sc_time_unit.SC_US);
             Console.WriteLine("Finished at {0}", sc_simcontext.sc_time_stamp());
         }
     }
