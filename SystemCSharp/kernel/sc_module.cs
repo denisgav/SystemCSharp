@@ -107,10 +107,7 @@ namespace sc_core
         //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
         //-----------------------------------------------------------------------------
 
-        public sc_simcontext sc_get_curr_simcontext()
-        {
-            return simcontext();
-        }
+        
 
         // to generate unique names for objects in an MT-Safe way
 

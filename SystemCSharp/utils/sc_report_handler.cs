@@ -59,15 +59,15 @@ namespace sc_core
             initialize();
         }
 
-        public static void report(sc_severity severity_, string msg_type_, string msg_)
+        public static sc_report report(sc_severity severity_, string msg_type_, string msg_)
         {
             string file = new System.Diagnostics.StackTrace(true).GetFrame(1).GetFileName();
             string member = new System.Diagnostics.StackTrace(true).GetFrame(1).GetMethod().Name;
             int line = new System.Diagnostics.StackTrace(true).GetFrame(1).GetFileLineNumber();
-            report(severity_, msg_type_, msg_, file, member, line);
+            return report(severity_, msg_type_, msg_, file, member, line);
         }
 
-        public static void report(sc_severity severity_, string msg_type_, string msg_,
+        public static sc_report report(sc_severity severity_, string msg_type_, string msg_,
                         string file = "",
                         string member = "",
                         int line = 0)
@@ -78,7 +78,7 @@ namespace sc_core
             // level is less than SC_MEDIUM return without any action.
 
             if ((severity_ == sc_severity.SC_INFO) && ((uint)sc_verbosity.SC_MEDIUM > (uint)verbosity_level))
-                return;
+                return null;
 
             // Process the report:
 
@@ -93,6 +93,7 @@ namespace sc_core
                 cache_report(new sc_report(rep));
 
             handler(rep, actions);
+            return rep;
         }
 
         public static uint set_actions(sc_severity severity_)

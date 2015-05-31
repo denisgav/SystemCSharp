@@ -235,6 +235,20 @@ namespace sc_dt
             return to_bool().ToString();
         }
 
+        public override string ToString()
+        {
+            return to_char().ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            sc_bit els = obj as sc_bit;
+            if (els == null)
+                return false;
+            return m_val == els.m_val;
+        }
+
+
         private bool m_val;
     }
 

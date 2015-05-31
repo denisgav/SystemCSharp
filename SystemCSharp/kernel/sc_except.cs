@@ -21,7 +21,7 @@ using System.Diagnostics;
 namespace sc_core
 {
 
-    public class sc_user
+    public class sc_user : Exception
     {
         //EMPTY
         public sc_user()
@@ -32,7 +32,7 @@ namespace sc_core
         }
     }
 
-    public class sc_halt
+    public class sc_halt : Exception
     {
         public sc_halt()
         {
@@ -42,7 +42,7 @@ namespace sc_core
         }
     }
 
-    public class sc_kill
+    public class sc_kill : Exception
     {
         public sc_kill()
         {

@@ -29,11 +29,6 @@ namespace sc_core
             this.parent = parent;
         }
 
-        // destructor
-        public virtual void Dispose()
-        {
-        }
-
         // switch stack protection on/off
         public virtual void stack_protect(bool arg) // enable
         {
@@ -80,6 +75,80 @@ namespace sc_core
         {
             get { return parent; }
             set { parent = value; }
+        }
+
+        // Track whether Dispose has been called.
+        private bool disposed = false;
+
+        // +----------------------------------------------------------------------------
+        // |"sc_object_manager::~sc_object_manager"
+        // | 
+        // | This is the object instance destructor for this class. It goes through
+        // | each sc_object instance in the instance table and sets its m_simc field
+        // | to NULL.
+        // +----------------------------------------------------------------------------
+
+        // Implement IDisposable.
+        // Do not make this method virtual.
+        // A derived class should not be able to override this method.
+        public void Dispose()
+        {
+            Dispose(true);
+            // This object will be cleaned up by the Dispose method.
+            // Therefore, you should call GC.SupressFinalize to
+            // take this object off the finalization queue
+            // and prevent finalization code for this object
+            // from executing a second time.
+            GC.SuppressFinalize(this);
+        }
+
+        // Dispose(bool disposing) executes in two distinct scenarios.
+        // If disposing equals true, the method has been called directly
+        // or indirectly by a user's code. Managed and unmanaged resources
+        // can be disposed.
+        // If disposing equals false, the method has been called by the
+        // runtime from inside the finalizer and you should not reference
+        // other objects. Only unmanaged resources can be disposed.
+        protected virtual void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!this.disposed)
+            {
+                // If disposing equals true, dispose all managed
+                // and unmanaged resources.
+                if (disposing)
+                {
+                    // Dispose managed resources.
+                    if((thread != null) && (thread.IsAlive == true))
+                    {
+                        thread.Abort();
+                    }
+                    autoEvent.Dispose();
+                    parent = null;
+                }
+
+                // Call the appropriate methods to clean up
+                // unmanaged resources here.
+                // If disposing is false,
+                // only the following code is executed.
+
+                // Note disposing has been done.
+                disposed = true;
+
+            }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        // This destructor will run only if the Dispose method
+        // does not get called.
+        // It gives your base class the opportunity to finalize.
+        // Do not provide destructors in types derived from this class.
+        ~sc_cor()
+        {
+            // Do not re-create Dispose clean-up code here.
+            // Calling Dispose(false) is optimal in terms of
+            // readability and maintainability.
+            Dispose(false);
         }
 
     }
@@ -142,7 +211,7 @@ namespace sc_core
                 mainCor.CorPkg = this;
                 activeCoroutine = mainCor;
 
-                
+
                 mainAutoEvent = new AutoResetEvent(true);
                 mainThread = System.Threading.Thread.CurrentThread;
                 mainCor.Thread = mainThread;
@@ -150,11 +219,6 @@ namespace sc_core
 
                 m_simc.set_curr_proc(mainCor.Parent);
             }
-        }
-
-        // destructor
-        public virtual void Dispose()
-        {
         }
 
         public virtual void ThreadMethod(object o)
@@ -244,12 +308,8 @@ namespace sc_core
         // abort the current coroutine (and resume the next coroutine)
         public virtual void abort(sc_cor next_cor)
         {
-            //next_cor.Mutex.WaitOne();
-            //next_cor.Mutex.ReleaseMutex();
-            //Console.WriteLine("Thread abort:", (next_cor.Parent != null) ? next_cor.Parent.name() : "NULL");
             next_cor.AutoEvent.Set();
             //next_cor.Thread.Abort();
-            //next_cor.Dispose();
         }
 
         // get the main coroutine
@@ -265,6 +325,75 @@ namespace sc_core
         }
 
         private sc_simcontext m_simc;
+
+        // Track whether Dispose has been called.
+        private bool disposed = false;
+
+        // +----------------------------------------------------------------------------
+        // |"sc_object_manager::~sc_object_manager"
+        // | 
+        // | This is the object instance destructor for this class. It goes through
+        // | each sc_object instance in the instance table and sets its m_simc field
+        // | to NULL.
+        // +----------------------------------------------------------------------------
+
+        // Implement IDisposable.
+        // Do not make this method virtual.
+        // A derived class should not be able to override this method.
+        public void Dispose()
+        {
+            Dispose(true);
+            // This object will be cleaned up by the Dispose method.
+            // Therefore, you should call GC.SupressFinalize to
+            // take this object off the finalization queue
+            // and prevent finalization code for this object
+            // from executing a second time.
+            GC.SuppressFinalize(this);
+        }
+
+        // Dispose(bool disposing) executes in two distinct scenarios.
+        // If disposing equals true, the method has been called directly
+        // or indirectly by a user's code. Managed and unmanaged resources
+        // can be disposed.
+        // If disposing equals false, the method has been called by the
+        // runtime from inside the finalizer and you should not reference
+        // other objects. Only unmanaged resources can be disposed.
+        protected virtual void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!this.disposed)
+            {
+                // If disposing equals true, dispose all managed
+                // and unmanaged resources.
+                if (disposing)
+                {
+                    // Dispose managed resources.
+                    mainAutoEvent.Dispose();
+                }
+
+                // Call the appropriate methods to clean up
+                // unmanaged resources here.
+                // If disposing is false,
+                // only the following code is executed.
+
+                // Note disposing has been done.
+                disposed = true;
+
+            }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        // This destructor will run only if the Dispose method
+        // does not get called.
+        // It gives your base class the opportunity to finalize.
+        // Do not provide destructors in types derived from this class.
+        ~sc_cor_pkg()
+        {
+            // Do not re-create Dispose clean-up code here.
+            // Calling Dispose(false) is optimal in terms of
+            // readability and maintainability.
+            Dispose(false);
+        }
     }
 
 } // namespace sc_core

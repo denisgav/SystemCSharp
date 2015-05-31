@@ -18,21 +18,105 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System;
 
 namespace sc_core
 {
-    public class sc_object_manager
+    public class sc_object_manager : IDisposable
     {
-        protected class table_entry
+        protected class sc_object_manager_table_entry : IDisposable
         {
-            public table_entry()
+            public sc_object_manager_table_entry(sc_event m_event_p = null, sc_object m_object_p = null)
             {
-                m_event_p = null;
-                m_object_p = null;
+                this.m_event_p = m_event_p;
+                this.m_object_p = m_object_p;
             }
 
-            public sc_event m_event_p; // if non-null this is an sc_event.
-            public sc_object m_object_p; // if non-null this is an sc_object.
+            private sc_event m_event_p; // if non-null this is an sc_event.
+            public sc_event Event
+            {
+                get { return m_event_p; }
+                set { m_event_p = value; }
+            }
+
+            private sc_object m_object_p; // if non-null this is an sc_object.
+            public sc_object Object
+            {
+                get { return m_object_p; }
+                set { m_object_p = value; }
+            }
+
+            // Track whether Dispose has been called.
+            private bool disposed = false;
+
+            // +----------------------------------------------------------------------------
+            // |"sc_object_manager::~sc_object_manager"
+            // | 
+            // | This is the object instance destructor for this class. It goes through
+            // | each sc_object instance in the instance table and sets its m_simc field
+            // | to NULL.
+            // +----------------------------------------------------------------------------
+
+            // Implement IDisposable.
+            // Do not make this method virtual.
+            // A derived class should not be able to override this method.
+            public void Dispose()
+            {
+                Dispose(true);
+                // This object will be cleaned up by the Dispose method.
+                // Therefore, you should call GC.SupressFinalize to
+                // take this object off the finalization queue
+                // and prevent finalization code for this object
+                // from executing a second time.
+                GC.SuppressFinalize(this);
+            }
+
+            // Dispose(bool disposing) executes in two distinct scenarios.
+            // If disposing equals true, the method has been called directly
+            // or indirectly by a user's code. Managed and unmanaged resources
+            // can be disposed.
+            // If disposing equals false, the method has been called by the
+            // runtime from inside the finalizer and you should not reference
+            // other objects. Only unmanaged resources can be disposed.
+            protected virtual void Dispose(bool disposing)
+            {
+                // Check to see if Dispose has already been called.
+                if (!this.disposed)
+                {
+                    // If disposing equals true, dispose all managed
+                    // and unmanaged resources.
+                    if (disposing)
+                    {
+                        // Dispose managed resources.
+                        if (m_event_p != null)
+                            m_event_p.Dispose();
+                        if (m_event_p != null)
+                            m_event_p.Dispose();
+                    }
+
+                    // Call the appropriate methods to clean up
+                    // unmanaged resources here.
+                    // If disposing is false,
+                    // only the following code is executed.
+
+                    // Note disposing has been done.
+                    disposed = true;
+
+                }
+            }
+
+            // Use C# destructor syntax for finalization code.
+            // This destructor will run only if the Dispose method
+            // does not get called.
+            // It gives your base class the opportunity to finalize.
+            // Do not provide destructors in types derived from this class.
+            ~sc_object_manager_table_entry()
+            {
+                // Do not re-create Dispose clean-up code here.
+                // Calling Dispose(false) is optimal in terms of
+                // readability and maintainability.
+                Dispose(false);
+            }
         }
 
         // ----------------------------------------------------------------------------
@@ -43,24 +127,11 @@ namespace sc_core
 
         public sc_object_manager()
         {
-            m_event_walk_ok = false;
-            m_instance_table = new Dictionary<string, table_entry>();
+            m_instance_table = new Dictionary<string, sc_object_manager_table_entry>();
             m_module_name_stack = new Stack<sc_module_name>();
             m_object_stack = new Stack<sc_object>();
-            m_object_walk_ok = false;
         }
 
-        // +----------------------------------------------------------------------------
-        // |"sc_object_manager::~sc_object_manager"
-        // | 
-        // | This is the object instance destructor for this class. It goes through
-        // | each sc_object instance in the instance table and sets its m_simc field
-        // | to NULL.
-        // +----------------------------------------------------------------------------
-        public void Dispose()
-        {
-            m_instance_table.Clear();
-        }
 
 
         // +----------------------------------------------------------------------------
@@ -76,7 +147,7 @@ namespace sc_core
         public sc_event find_event(string name)
         {
             if (m_instance_table.ContainsKey(name))
-                return m_instance_table[name].m_event_p;
+                return m_instance_table[name].Event;
 
             return null;
         }
@@ -95,16 +166,16 @@ namespace sc_core
         public sc_object find_object(string name)
         {
             if (m_instance_table.ContainsKey(name))
-                return m_instance_table[name].m_object_p;
+                return m_instance_table[name].Object;
 
             return null;
         }
 
         public System.Collections.Generic.IEnumerable<sc_object> get_objects()
         {
-            foreach(var item in m_instance_table)
+            foreach (var item in m_instance_table)
             {
-                yield return item.Value.m_object_p;
+                yield return item.Value.Object;
             }
         }
 
@@ -112,10 +183,10 @@ namespace sc_core
         {
             foreach (var item in m_instance_table)
             {
-                yield return item.Value.m_event_p;
+                yield return item.Value.Event;
             }
         }
-        
+
 
         // +----------------------------------------------------------------------------
         // |"sc_object_manager::hierarchy_push"
@@ -262,7 +333,7 @@ namespace sc_core
             clash = false;
             for (; ; )
             {
-                if(m_instance_table.ContainsKey(result_string) == false)
+                if (m_instance_table.ContainsKey(result_string) == false)
                 {
                     break;
                 }
@@ -304,9 +375,9 @@ namespace sc_core
         public void insert_event(string name, sc_event event_p)
         {
             if (m_instance_table.ContainsKey(name) == true)
-                m_instance_table[name].m_event_p = event_p;
+                m_instance_table[name].Event = event_p;
             else
-                m_instance_table.Add(name, new table_entry() { m_event_p = event_p });
+                m_instance_table.Add(name, new sc_object_manager_table_entry() { Event = event_p });
         }
 
         // +----------------------------------------------------------------------------
@@ -322,9 +393,9 @@ namespace sc_core
         public virtual void insert_object(string name, sc_object object_p)
         {
             if (m_instance_table.ContainsKey(name) == true)
-                m_instance_table[name].m_object_p = object_p;
+                m_instance_table[name].Object = object_p;
             else
-                m_instance_table.Add(name, new table_entry(){ m_object_p = object_p});
+                m_instance_table.Add(name, new sc_object_manager_table_entry() { Object = object_p });
         }
 
         // +----------------------------------------------------------------------------
@@ -340,7 +411,7 @@ namespace sc_core
         public void remove_event(string name)
         {
             if (m_instance_table.ContainsKey(name))
-                m_instance_table[name].m_event_p = null;
+                m_instance_table[name].Event = null;
         }
 
         // +----------------------------------------------------------------------------
@@ -356,13 +427,80 @@ namespace sc_core
         public virtual void remove_object(string name)
         {
             if (m_instance_table.ContainsKey(name))
-                m_instance_table[name].m_object_p = null;
+                m_instance_table[name].Object = null;
         }
 
-        private bool m_event_walk_ok; // true if can walk events.
-        private Dictionary<string, table_entry> m_instance_table = new Dictionary<string, table_entry>();
+        private Dictionary<string, sc_object_manager_table_entry> m_instance_table = new Dictionary<string, sc_object_manager_table_entry>();
         private Stack<sc_module_name> m_module_name_stack = new Stack<sc_module_name>(); // sc_module_name stack.
         private Stack<sc_object> m_object_stack = new Stack<sc_object>();
-        private bool m_object_walk_ok; // true if can walk objects.
+
+        // Track whether Dispose has been called.
+        private bool disposed = false;
+
+        // +----------------------------------------------------------------------------
+        // |"sc_object_manager::~sc_object_manager"
+        // | 
+        // | This is the object instance destructor for this class. It goes through
+        // | each sc_object instance in the instance table and sets its m_simc field
+        // | to NULL.
+        // +----------------------------------------------------------------------------
+
+        // Implement IDisposable.
+        // Do not make this method virtual.
+        // A derived class should not be able to override this method.
+        public void Dispose()
+        {
+            Dispose(true);
+            // This object will be cleaned up by the Dispose method.
+            // Therefore, you should call GC.SupressFinalize to
+            // take this object off the finalization queue
+            // and prevent finalization code for this object
+            // from executing a second time.
+            GC.SuppressFinalize(this);
+        }
+
+        // Dispose(bool disposing) executes in two distinct scenarios.
+        // If disposing equals true, the method has been called directly
+        // or indirectly by a user's code. Managed and unmanaged resources
+        // can be disposed.
+        // If disposing equals false, the method has been called by the
+        // runtime from inside the finalizer and you should not reference
+        // other objects. Only unmanaged resources can be disposed.
+        protected virtual void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!this.disposed)
+            {
+                // If disposing equals true, dispose all managed
+                // and unmanaged resources.
+                if (disposing)
+                {
+                    // Dispose managed resources.
+                    m_instance_table.Clear();
+                }
+
+                // Call the appropriate methods to clean up
+                // unmanaged resources here.
+                // If disposing is false,
+                // only the following code is executed.
+
+                // Note disposing has been done.
+                disposed = true;
+
+            }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        // This destructor will run only if the Dispose method
+        // does not get called.
+        // It gives your base class the opportunity to finalize.
+        // Do not provide destructors in types derived from this class.
+        ~sc_object_manager()
+        {
+            // Do not re-create Dispose clean-up code here.
+            // Calling Dispose(false) is optimal in terms of
+            // readability and maintainability.
+            Dispose(false);
+        }
     }
 }

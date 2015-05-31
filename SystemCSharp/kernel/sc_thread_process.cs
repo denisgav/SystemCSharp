@@ -754,20 +754,20 @@ namespace sc_core
             while (true)
             {
 
-                //try
-                //{
+                try
+                {
                     thread_h.semantics();
-                //}
+                }
                 //-----------------------------------------------------------------------------
                 //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-                /*
+                
                 catch (sc_user)
                 {
                     continue;
                 }
                 catch (sc_halt)
                 {
-                    Console.Writeline("Terminating process " + thread_h.name());
+                    Console.WriteLine("Terminating process " + thread_h.name());
                 }
                 catch (sc_unwind_exception ex)
                 {
@@ -775,18 +775,14 @@ namespace sc_core
                     if (ex.is_reset())
                         continue;
                 }
-                catch
-                {
-                    sc_report err_p = sc_simcontext.sc_handle_exception();
-                    thread_h.simcontext().set_error(err_p);
-                }
-                */
                 //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
                 //-----------------------------------------------------------------------------
-                //catch (Exception ex)
-                //{
-                //    Console.WriteLine("Terminating process " + thread_h == null ? "" : thread_h.name());
-                //}
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Terminating process " + thread_h == null ? "" : thread_h.name());
+                    sc_report err_p = sc_report.sc_handle_exception(ex);
+                    thread_h.simcontext().set_error(err_p);
+                }                
                 break;
             }
 

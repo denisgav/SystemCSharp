@@ -21,19 +21,114 @@ using System;
 using System.Diagnostics;
 namespace sc_core
 {
-    public class sc_event
+    public enum sc_event_notify_t
     {
-        private enum notify_t
+        NONE,
+        DELTA,
+        TIMED
+    }
+
+    // ----------------------------------------------------------------------------
+    //  CLASS : sc_event_timed
+    //
+    //  Class for storing the time to notify a timed event.
+    // ----------------------------------------------------------------------------
+    public class sc_event_timed : IDisposable
+    {
+        public sc_event m_event;
+        public sc_time m_notify_time = new sc_time();
+
+        public sc_event_timed(sc_event e, sc_time t)
         {
-            NONE,
-            DELTA,
-            TIMED
+            m_event = e;
+            m_notify_time = new sc_time(t);
         }
 
+        public virtual sc_time NotifyTime
+        {
+            get { return m_notify_time; }
+        }
+
+        public virtual sc_event Event
+        {
+            get { return m_event; }
+        }
+
+        // Track whether Dispose has been called.
+        private bool disposed = false;
+
+        // Implement IDisposable.
+        // Do not make this method virtual.
+        // A derived class should not be able to override this method.
+        // +----------------------------------------------------------------------------
+        // |"sc_event::~sc_event"
+        // | 
+        // | This is the object instance destructor for this class. It cancels any
+        // | outstanding waits and removes the event from the object manager's 
+        // | instance table if it has a name.
+        // +----------------------------------------------------------------------------
+        public void Dispose()
+        {
+            Dispose(true);
+            // This object will be cleaned up by the Dispose method.
+            // Therefore, you should call GC.SupressFinalize to
+            // take this object off the finalization queue
+            // and prevent finalization code for this object
+            // from executing a second time.
+            GC.SuppressFinalize(this);
+        }
+
+        // Dispose(bool disposing) executes in two distinct scenarios.
+        // If disposing equals true, the method has been called directly
+        // or indirectly by a user's code. Managed and unmanaged resources
+        // can be disposed.
+        // If disposing equals false, the method has been called by the
+        // runtime from inside the finalizer and you should not reference
+        // other objects. Only unmanaged resources can be disposed.
+        protected virtual void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!this.disposed)
+            {
+                // If disposing equals true, dispose all managed
+                // and unmanaged resources.
+                if (disposing)
+                {
+                    // Dispose managed resources.
+                    m_event.Dispose();
+                }
+
+                // Call the appropriate methods to clean up
+                // unmanaged resources here.
+                // If disposing is false,
+                // only the following code is executed.
+
+                // Note disposing has been done.
+                disposed = true;
+
+            }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        // This destructor will run only if the Dispose method
+        // does not get called.
+        // It gives your base class the opportunity to finalize.
+        // Do not provide destructors in types derived from this class.
+        ~sc_event_timed()
+        {
+            // Do not re-create Dispose clean-up code here.
+            // Calling Dispose(false) is optimal in terms of
+            // readability and maintainability.
+            Dispose(false);
+        }
+    }
+
+    public class sc_event : IDisposable
+    {
         private string m_name; // name of object.
         private sc_object m_parent_p; // parent sc_object for this event.
         private sc_simcontext m_simc;
-        private notify_t m_notify_type;
+        private sc_event_notify_t m_notify_type;
         public int m_delta_event_index;
         private sc_event_timed m_timed;
 
@@ -55,7 +150,7 @@ namespace sc_core
             m_name = string.Empty;
             m_parent_p = null;
             m_simc = sc_simcontext.sc_get_curr_simcontext();
-            m_notify_type = notify_t.NONE;
+            m_notify_type = sc_event_notify_t.NONE;
             m_delta_event_index = -1;
             m_timed = null;
             m_methods_static = new List<sc_method_process>();
@@ -80,7 +175,7 @@ namespace sc_core
             m_name = name;
             m_parent_p = null;
             m_simc = sc_simcontext.sc_get_curr_simcontext();
-            m_notify_type = notify_t.NONE;
+            m_notify_type = sc_event_notify_t.NONE;
             m_delta_event_index = -1;
             m_timed = null;
             m_methods_static = new List<sc_method_process>();
@@ -91,42 +186,25 @@ namespace sc_core
             register_event(name);
         }
 
-        // +----------------------------------------------------------------------------
-        // |"sc_event::~sc_event"
-        // | 
-        // | This is the object instance destructor for this class. It cancels any
-        // | outstanding waits and removes the event from the object manager's 
-        // | instance table if it has a name.
-        // +----------------------------------------------------------------------------
-        public virtual void Dispose()
-        {
-            cancel();
-            if (m_name.Length != 0)
-            {
-                sc_object_manager object_manager_p = m_simc.get_object_manager();
-                object_manager_p.remove_event(m_name);
-            }
-        }
-
         public virtual void cancel()
         {
             // cancel a delta or timed notification
             switch (m_notify_type)
             {
-                case notify_t.DELTA:
+                case sc_event_notify_t.DELTA:
                     {
                         // remove this event from the delta events set
                         m_simc.remove_delta_event(this);
-                        m_notify_type = notify_t.NONE;
+                        m_notify_type = sc_event_notify_t.NONE;
                         break;
                     }
-                case notify_t.TIMED:
+                case sc_event_notify_t.TIMED:
                     {
                         // remove this event from the timed events set
                         Debug.Assert(m_timed != null);
                         m_timed.m_event = null;
                         m_timed = null;
-                        m_notify_type = notify_t.NONE;
+                        m_notify_type = sc_event_notify_t.NONE;
                         break;
                     }
                 default:
@@ -186,7 +264,7 @@ namespace sc_core
 
         public virtual void notify(sc_time t)
         {
-            if (m_notify_type == notify_t.DELTA)
+            if (m_notify_type == sc_event_notify_t.DELTA)
             {
                 return;
             }
@@ -198,7 +276,7 @@ namespace sc_core
                     sc_report_handler.report(sc_core.sc_severity.SC_WARNING, "forbidden action in simulation phase callback", msg);
                     return;
                 }
-                if (m_notify_type == notify_t.TIMED)
+                if (m_notify_type == sc_event_notify_t.TIMED)
                 {
                     // remove this event from the timed events set
                     Debug.Assert(m_timed != null);
@@ -207,7 +285,7 @@ namespace sc_core
                 }
                 // add this event to the delta events set
                 m_delta_event_index = m_simc.add_delta_event(this);
-                m_notify_type = notify_t.DELTA;
+                m_notify_type = sc_event_notify_t.DELTA;
                 return;
             }
             if ((m_simc.get_status() & (sc_status.SC_END_OF_UPDATE | sc_status.SC_BEFORE_TIMESTEP)) == 0)
@@ -216,7 +294,7 @@ namespace sc_core
                 sc_report_handler.report(sc_core.sc_severity.SC_WARNING, "forbidden action in simulation phase callback", msg);
                 return;
             }
-            if (m_notify_type == notify_t.TIMED)
+            if (m_notify_type == sc_event_notify_t.TIMED)
             {
                 Debug.Assert(m_timed != null);
                 if (m_timed.m_notify_time <= m_simc.time_stamp() + t)
@@ -231,7 +309,7 @@ namespace sc_core
             sc_event_timed et = new sc_event_timed(this, (m_simc.time_stamp() + t));
             m_simc.add_timed_event(et);
             m_timed = et;
-            m_notify_type = notify_t.TIMED;
+            m_notify_type = sc_event_notify_t.TIMED;
         }
 
         // IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
@@ -243,18 +321,18 @@ namespace sc_core
 
         public virtual void notify_delayed()
         {
-            if (m_notify_type != notify_t.NONE)
+            if (m_notify_type != sc_event_notify_t.NONE)
             {
                 sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "notify_delayed() cannot be called on events ", "");
             }
             // add this event to the delta events set
             m_delta_event_index = m_simc.add_delta_event(this);
-            m_notify_type = notify_t.DELTA;
+            m_notify_type = sc_event_notify_t.DELTA;
         }
 
         public virtual void notify_delayed(sc_time t)
         {
-            if (m_notify_type != notify_t.NONE)
+            if (m_notify_type != sc_event_notify_t.NONE)
             {
                 sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "notify_delayed() cannot be called on events ", "");
             }
@@ -262,7 +340,7 @@ namespace sc_core
             {
                 // add this event to the delta events set
                 m_delta_event_index = m_simc.add_delta_event(this);
-                m_notify_type = notify_t.DELTA;
+                m_notify_type = sc_event_notify_t.DELTA;
             }
             else
             {
@@ -270,7 +348,7 @@ namespace sc_core
                 sc_event_timed et = new sc_event_timed(this, m_simc.time_stamp() + t);
                 m_simc.add_timed_event(et);
                 m_timed = et;
-                m_notify_type = notify_t.TIMED;
+                m_notify_type = sc_event_notify_t.TIMED;
             }
         }
 
@@ -321,26 +399,26 @@ namespace sc_core
             {
                 // add this event to the delta events set
                 m_delta_event_index = m_simc.add_delta_event(this);
-                m_notify_type = notify_t.DELTA;
+                m_notify_type = sc_event_notify_t.DELTA;
             }
             else
             {
                 sc_event_timed et = new sc_event_timed(this, m_simc.time_stamp() + t);
                 m_simc.add_timed_event(et);
                 m_timed = et;
-                m_notify_type = notify_t.TIMED;
+                m_notify_type = sc_event_notify_t.TIMED;
             }
         }
 
         public virtual void notify_next_delta()
         {
-            if (m_notify_type != notify_t.NONE)
+            if (m_notify_type != sc_event_notify_t.NONE)
             {
                 sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "notify_delayed() cannot be called on events that have pending notifications", "");
             }
             // add this event to the delta events set
             m_delta_event_index = m_simc.add_delta_event(this);
-            m_notify_type = notify_t.DELTA;
+            m_notify_type = sc_event_notify_t.DELTA;
         }
 
 
@@ -434,7 +512,7 @@ namespace sc_core
 
         public virtual void reset()
         {
-            m_notify_type = notify_t.NONE;
+            m_notify_type = sc_event_notify_t.NONE;
             m_delta_event_index = -1;
             m_timed = null;
             // clear the dynamic sensitive methods
@@ -513,344 +591,96 @@ namespace sc_core
             }
 
 
-            m_notify_type = notify_t.NONE;
+            m_notify_type = sc_event_notify_t.NONE;
             m_delta_event_index = -1;
             m_timed = null;
         }
-    }
 
+        // Track whether Dispose has been called.
+        private bool disposed = false;
 
-    public class sc_event_expr<T>
-        where T : sc_event
-    {
+        // +----------------------------------------------------------------------------
+        // |"sc_object_manager::~sc_object_manager"
+        // | 
+        // | This is the object instance destructor for this class. It goes through
+        // | each sc_object instance in the instance table and sets its m_simc field
+        // | to NULL.
+        // +----------------------------------------------------------------------------
 
-        private sc_event_expr()
+        // Implement IDisposable.
+        // Do not make this method virtual.
+        // A derived class should not be able to override this method.
+        // +----------------------------------------------------------------------------
+        // |"sc_event::~sc_event"
+        // | 
+        // | This is the object instance destructor for this class. It cancels any
+        // | outstanding waits and removes the event from the object manager's 
+        // | instance table if it has a name.
+        // +----------------------------------------------------------------------------
+        public void Dispose()
         {
-            m_expr = new List<T>();
+            Dispose(true);
+            // This object will be cleaned up by the Dispose method.
+            // Therefore, you should call GC.SupressFinalize to
+            // take this object off the finalization queue
+            // and prevent finalization code for this object
+            // from executing a second time.
+            GC.SuppressFinalize(this);
         }
 
-
-        public sc_event_expr(sc_event_expr<T> e) // move semantics
+        // Dispose(bool disposing) executes in two distinct scenarios.
+        // If disposing equals true, the method has been called directly
+        // or indirectly by a user's code. Managed and unmanaged resources
+        // can be disposed.
+        // If disposing equals false, the method has been called by the
+        // runtime from inside the finalizer and you should not reference
+        // other objects. Only unmanaged resources can be disposed.
+        protected virtual void Dispose(bool disposing)
         {
-            m_expr = e.m_expr;
-        }
-
-        public virtual void release()
-        {
-            Debug.Assert(m_expr != null);
-            m_expr.Clear();
-        }
-
-
-        public virtual void push_back(T el)
-        {
-            Debug.Assert(m_expr != null);
-            m_expr.Add(el);
-        }
-
-
-        private List<T> m_expr = new List<T>();
-
-    }
-
-    // ----------------------------------------------------------------------------
-    //  CLASS : sc_event_list
-    //
-    //  Base class for lists of events.
-    // ----------------------------------------------------------------------------
-
-    public partial class sc_event_list
-    {
-
-        public int size()
-        {
-            return m_events.Count;
-        }
-
-
-
-        // ----------------------------------------------------------------------------
-        //  CLASS : sc_event_list
-        //
-        //  Base class for lists of events.
-        // ----------------------------------------------------------------------------
-
-        public virtual void push_back(sc_event e)
-        {
-            // make sure e is not already in the list
-            if (m_events.Contains(e) == false)
-                m_events.Push(e);
-        }
-        public virtual void push_back(sc_event_list el)
-        {
-            foreach (sc_event e in el.m_events)
+            // Check to see if Dispose has already been called.
+            if (!this.disposed)
             {
-                push_back(e);
-            }
-            el.auto_delete();
-        }
-
-
-        // IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-
-        public sc_event_list(bool and_list_)
-            : this(and_list_, false)
-        {
-        }
-
-        public sc_event_list(bool and_list_, bool auto_delete_)
-        {
-            m_events = new Stack<sc_event>();
-            m_and_list = and_list_;
-            m_auto_delete = auto_delete_;
-            m_busy = 0;
-        }
-
-        public sc_event_list(sc_event e, bool and_list_)
-            : this(e, and_list_, false)
-        {
-        }
-
-        public sc_event_list(sc_event e, bool and_list_, bool auto_delete_)
-        {
-            m_events = new Stack<sc_event>();
-            m_and_list = and_list_;
-            m_auto_delete = auto_delete_;
-            m_busy = 0;
-            m_events.Push(e);
-        }
-
-        ~sc_event_list()
-        {
-            if (m_busy != 0)
-                report_premature_destruction();
-        }
-
-
-
-        public virtual bool and_list()
-        {
-            return m_and_list;
-        }
-
-
-        public virtual void add_dynamic(sc_method_process method_h)
-        {
-            m_busy++;
-            if (m_events.Count != 0)
-            {
-                foreach (sc_event e in m_events)
+                // If disposing equals true, dispose all managed
+                // and unmanaged resources.
+                if (disposing)
                 {
-                    e.add_dynamic(method_h);
-                }
-            }
-        }
-
-
-        public virtual void add_dynamic(sc_thread_process thread_h)
-        {
-            m_busy++;
-            if (m_events.Count != 0)
-            {
-                foreach (sc_event e in m_events)
-                {
-                    e.add_dynamic(thread_h);
-                }
-            }
-        }
-
-        public virtual void remove_dynamic(sc_method_process method_h, sc_event e_not)
-        {
-            if (m_events.Count != 0)
-            {
-                foreach (sc_event e in m_events)
-                {
-                    if (e != e_not)
+                    // Dispose managed resources.
+                    cancel();
+                    if (m_name.Length != 0)
                     {
-                        e.remove_dynamic(method_h);
+                        sc_object_manager object_manager_p = m_simc.get_object_manager();
+                        object_manager_p.remove_event(m_name);
                     }
+                    m_timed.Dispose();
+
+                    m_methods_static.Clear();
+                    m_methods_dynamic.Clear();
+                    m_threads_static.Clear();
+                    m_threads_dynamic.Clear();
                 }
+
+                // Call the appropriate methods to clean up
+                // unmanaged resources here.
+                // If disposing is false,
+                // only the following code is executed.
+
+                // Note disposing has been done.
+                disposed = true;
+
             }
         }
 
-        public virtual void remove_dynamic(sc_thread_process thread_h, sc_event e_not)
+        // Use C# destructor syntax for finalization code.
+        // This destructor will run only if the Dispose method
+        // does not get called.
+        // It gives your base class the opportunity to finalize.
+        // Do not provide destructors in types derived from this class.
+        ~sc_event()
         {
-            if (m_events.Count != 0)
-            {
-                foreach (sc_event e in m_events)
-                {
-                    if (e != e_not)
-                    {
-                        e.remove_dynamic(thread_h);
-                    }
-                }
-            }
+            // Do not re-create Dispose clean-up code here.
+            // Calling Dispose(false) is optimal in terms of
+            // readability and maintainability.
+            Dispose(false);
         }
-
-
-        public virtual bool busy()
-        {
-            return m_busy != 0;
-        }
-
-        public virtual bool temporary()
-        {
-            return m_auto_delete && m_busy == 0;
-        }
-
-        public virtual void auto_delete()
-        {
-            if (m_busy != 0)
-            {
-                --m_busy;
-            }
-        }
-
-
-        protected void report_premature_destruction()
-        {
-            // TDB: reliably detect premature destruction
-            //
-            // If an event list is used as a member of a module,
-            // its lifetime may (correctly) end, although there
-            // are processes currently waiting for it.
-            //
-            // Detecting (and ignoring) this corner-case is quite
-            // difficult for similar reasons to the sc_is_running()
-            // return value during the destruction of the module
-            // hierarchy.
-            //
-            // Ignoring the lifetime checks for now, if no process
-            // is currently running (which is only part of the story):
-
-            if (sc_simcontext.sc_get_current_process_handle().valid())
-            {
-                // FIXME: improve error-handling
-                Debug.Assert(false, "sc_event_list prematurely destroyed");
-            }
-
-        }
-
-        protected void report_invalid_modification()
-        {
-            // FIXME: improve error-handling
-            Debug.Assert(false, "sc_event_list modfied while being waited on");
-        }
-
-
-        private readonly Stack<sc_event> m_events = new Stack<sc_event>();
-        private bool m_and_list;
-        private bool m_auto_delete;
-        private uint m_busy;
-    }
-
-
-    // ----------------------------------------------------------------------------
-    //  CLASS : sc_event_and_list
-    //
-    //  AND list of events.
-    // ----------------------------------------------------------------------------
-
-    public class sc_event_and_list : sc_event_list
-    {
-
-        protected sc_event_and_list(bool auto_delete_)
-            : base(true, auto_delete_)
-        {
-        }
-
-
-
-        // IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-
-        public sc_event_and_list()
-            : base(true)
-        {
-        }
-        public sc_event_and_list(sc_event e)
-            : base(true)
-        {
-            push_back(e);
-        }
-
-
-        public static sc_event_and_list operator &(sc_event_and_list e1, sc_event e2)
-        {
-
-            sc_event_and_list expr = new sc_event_and_list();
-            expr.push_back(e1);
-            expr.push_back(e2);
-            return expr;
-        }
-
-    }
-
-    // ----------------------------------------------------------------------------
-    //  CLASS : sc_event_or_list
-    //
-    //  OR list of events.
-    // ----------------------------------------------------------------------------
-
-    public class sc_event_or_list : sc_event_list
-    {
-        protected sc_event_or_list(bool auto_delete_)
-            : base(false, auto_delete_)
-        {
-        }
-
-
-        // IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-
-        public sc_event_or_list()
-            : base(false)
-        {
-        }
-        public sc_event_or_list(sc_event e)
-            : base(false)
-        {
-            push_back(e);
-        }
-
-
-
-
-        public static sc_event_or_list operator |(sc_event_or_list e1, sc_event e2)
-        {
-            sc_event_or_list expr = new sc_event_or_list();
-            expr.push_back(e1);
-            expr.push_back(e2);
-            return expr;
-        }
-
-    }
-
-    // ----------------------------------------------------------------------------
-    //  CLASS : sc_event_timed
-    //
-    //  Class for storing the time to notify a timed event.
-    // ----------------------------------------------------------------------------
-
-    public class sc_event_timed
-    {
-        public sc_event_timed(sc_event e, sc_time t)
-        {
-            m_event = e;
-            m_notify_time = new sc_time(t);
-        }
-
-
-
-        public sc_time notify_time()
-        {
-            return m_notify_time;
-        }
-
-        public sc_event m_event;
-        public sc_time m_notify_time = new sc_time();
-
-        public sc_event Event()
-        {
-            return m_event;
-        }
-    }
+    }    
 }

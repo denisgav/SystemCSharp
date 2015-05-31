@@ -48,6 +48,7 @@
     <Compile Include="kernel\sc_cor.cs" />
     <Compile Include="kernel\sc_cthread_process.cs" />
     <Compile Include="kernel\sc_event.cs" />
+    <Compile Include="kernel\sc_event_list.cs" />
     <Compile Include="kernel\sc_except.cs" />
     <Compile Include="kernel\sc_join.cs" />
     <Compile Include="kernel\sc_method_process.cs" />

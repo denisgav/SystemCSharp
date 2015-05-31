@@ -76,16 +76,12 @@ namespace sc_core
         //-------------------------------------------------------------------------------------------------------------
         //-------------------------------------------------------------------------------------------------------------
         // for SC_CTHREADs
-
         public static void halt()
         {
             halt(sc_simcontext.sc_get_curr_simcontext());
         }
 
         // for SC_CTHREADs
-
-        //C++ TO C# CONVERTER NOTE: Overloaded method(s) are created above to convert the following method having default parameters:
-        //ORIGINAL LINE: void halt(sc_simcontext* simc = sc_get_curr_simcontext())
         public static void halt(sc_simcontext simc)
         {
             sc_curr_proc_info cpi = simc.get_curr_proc_info();
@@ -124,13 +120,21 @@ namespace sc_core
                     (cpi.process_handle as sc_cthread_process).wait_cycles(n);
                     break;
                 default:
-                    //C++ TO C# CONVERTER TODO TASK: There is no direct equivalent in C# to the C++ __LINE__ macro:
-                    //C++ TO C# CONVERTER TODO TASK: There is no direct equivalent in C# to the C++ __FILE__ macro:
                     sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "wait() is only allowed in SC_THREADs and SC_CTHREADs", "\n        " + "in SC_METHODs use next_trigger() instead");
                     break;
             }
         }
-        /*
+
+
+    }
+
+} // namespace sc_core
+
+
+
+
+
+/*
         public static void at_posedge(sc_signal_in_if<bool> s)
         {
             at_posedge(s, sc_get_curr_simcontext());
@@ -203,9 +207,5 @@ namespace sc_core
             } while (s.read() == '1');
         }
         */
-        //-------------------------------------------------------------------------------------------------------------
-        //-------------------------------------------------------------------------------------------------------------
-
-    }
-
-} // namespace sc_core
+//-------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------

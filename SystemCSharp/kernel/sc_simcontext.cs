@@ -477,7 +477,7 @@ namespace sc_core
                     {
                         sc_event_timed et = m_timed_events[0];
                         m_timed_events.RemoveAt(0);
-                        sc_event e = et.Event();
+                        sc_event e = et.Event;
                         /*
                         if (et != null)
                             et.Dispose();
@@ -486,7 +486,7 @@ namespace sc_core
                         {
                             e.trigger();
                         }
-                    } while ((m_timed_events.Count != 0) && m_timed_events[m_timed_events.Count - 1].notify_time() == t);
+                    } while ((m_timed_events.Count != 0) && m_timed_events[m_timed_events.Count - 1].NotifyTime == t);
 
                 } while (m_runnable.IsEmpty);
             } while (t < until_t); // hold off on the delta for the until_t time.
@@ -1147,9 +1147,9 @@ namespace sc_core
             while (m_timed_events.Count != 0)
             {
                 sc_event_timed et = m_timed_events[0];
-                if (et.Event() != null)
+                if (et.Event != null)
                 {
-                    result = et.notify_time();
+                    result = et.NotifyTime;
                     return true;
                 }
                 m_timed_events.RemoveAt(0);
@@ -2021,8 +2021,8 @@ namespace sc_core
             sc_event_timed et1 = (sc_event_timed)(p1);
             sc_event_timed et2 = (sc_event_timed)(p2);
 
-            sc_time t1 = et1.notify_time();
-            sc_time t2 = et2.notify_time();
+            sc_time t1 = et1.NotifyTime;
+            sc_time t2 = et2.NotifyTime;
 
             if (t1 < t2)
             {

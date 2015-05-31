@@ -301,5 +301,10 @@ namespace sc_core
         }
 
         public static bool warnings_are_errors = false;
+
+        internal static sc_report sc_handle_exception(Exception ex)
+        {
+            return sc_report_handler.report(sc_severity.SC_ERROR, ex.Message, ex.Message, ex.Source);
+        }
     }
 }

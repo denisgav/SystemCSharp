@@ -31,6 +31,14 @@ namespace sc_core
         protected static List<sc_object> empty_object_vector; // If m_target_p == 0.
         protected static sc_event non_event;           // If m_target_p == 0.
 
+        public override bool Equals(object obj)
+        {
+            sc_process_handle els = obj as sc_process_handle;
+            if (els == null)
+                return false;
+            return (els.m_target_p == m_target_p);
+        }
+
         public static bool operator ==(sc_process_handle left, sc_process_handle right)
         {
             return (left.m_target_p != null) && (right.m_target_p != null) &&
