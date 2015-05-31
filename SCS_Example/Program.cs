@@ -30,7 +30,10 @@ namespace SCS_Example
         {
             public override void invoke(sc_process_host host_p)
             {
-                step();
+                for (int i = 0; i < 3; i++)
+                {
+                    step();
+                }
                 base.invoke(host_p);
             }
             void step()
@@ -48,7 +51,10 @@ namespace SCS_Example
         {
             public override void invoke(sc_process_host host_p)
             {
-                step();
+                for (int i = 0; i < 5; i++)
+                {
+                    step();
+                }
                 base.invoke(host_p);
             }
             void step()
@@ -100,9 +106,9 @@ namespace SCS_Example
             clkgen clkgen1 = new clkgen(null, "clkgen1", 100);
             Console.WriteLine("Starting 1");
             sc_simcontext.sc_start(10000, sc_time_unit.SC_US);
-            Console.WriteLine("Starting 2");
-            sc_simcontext.sc_start(10000, sc_time_unit.SC_US);
-            Console.WriteLine("Finished at {0}", sc_simcontext.sc_time_stamp());
+            //Console.WriteLine("Starting 2");
+            //sc_simcontext.sc_start(10000, sc_time_unit.SC_US);
+            //Console.WriteLine("Finished at {0}", sc_simcontext.sc_time_stamp());
         }
     }
 }

@@ -58,7 +58,7 @@ namespace sc_core
     //
     //  Enumeration of actions on an exception (implementation specific)
     // ----------------------------------------------------------------------------
-    public enum ReportAction
+    public enum sc_report_action
     {
         SC_UNSPECIFIED = 0x0000, // look for lower-priority rule
         SC_DO_NOTHING = 0x0001, // take no action (ignore if other bits set)
@@ -73,61 +73,90 @@ namespace sc_core
 
     public class sc_report : Exception
     {
-
-        public string get_msg()
+        private string msg;
+        public override string Message
         {
-            return msg;
+            get { return msg; }
         }
 
-        public sc_severity get_severity()
+        private sc_severity severity;
+        public virtual sc_severity Severity
         {
-            return severity;
+            get { return severity; }
+            set { severity = value; }
         }
 
-        public string get_file_name()
+        private sc_msg_def md;
+        public virtual sc_msg_def MsgDef
         {
-            return file;
+            get { return md; }
+            set { md = value; }
         }
 
-        public int get_line_number()
+        private string file;
+        public virtual string File
         {
-            return line;
+            get { return file; }
+            set { file = value; }
         }
 
-        public sc_time get_time()
+        private string member;
+        public virtual string Member
         {
-            return timestamp;
+            get { return member; }
+            set { member = value; }
         }
 
-        public int get_verbosity()
+        private int line;
+        public virtual int Line
         {
-            return m_verbosity_level;
+            get { return line; }
+            set { line = value; }
         }
 
-        public bool valid()
+        private sc_time timeStamp;
+        public virtual sc_time TimeStamp
         {
-            return process != null;
+            get { return timeStamp; }
+            set { timeStamp = value; }
         }
 
-        public virtual string what()
+        private sc_object sender;
+        public virtual sc_object Sender
         {
-            return m_what;
+            get { return sender; }
+            set { sender = value; }
         }
 
-        public virtual string get_process_name()
+        public bool Valid
         {
-            return (process != null)?process.name():string.Empty;
+            get
+            {
+                return sender != null;
+            }
         }
 
-        protected sc_severity severity;
-        protected readonly sc_msg_def md;
-        protected string msg;
-        protected string file;
-        protected int line;
-        protected sc_time timestamp;
-        protected sc_object process;
-        protected int m_verbosity_level;
-        protected string m_what;
+        public virtual string SenderName
+        {
+            get
+            {
+                return (sender != null) ? sender.name() : string.Empty;
+            }
+        }
+
+        private int mVerbosityLevel;
+        public virtual int VerbosityLevel
+        {
+            get { return mVerbosityLevel; }
+            set { mVerbosityLevel = value; }
+        }
+
+        private string mWhat;
+        public virtual string What
+        {
+            get { return mWhat; }
+            set { mWhat = value; }
+        }
 
         public sc_report()
         {
@@ -135,23 +164,25 @@ namespace sc_core
             md = null;
             msg = string.Empty;
             file = string.Empty;
+            member = string.Empty;
             line = 0;
-            timestamp = new sc_time();
-            process = null;
-            m_verbosity_level = (int)sc_verbosity.SC_MEDIUM;
-            m_what = string.Empty;
+            timeStamp = new sc_time();
+            sender = null;
+            mVerbosityLevel = (int)sc_verbosity.SC_MEDIUM;
+            mWhat = string.Empty;
         }
-        public sc_report(sc_severity severity_, sc_msg_def md_, string msg_, int verbosity_level = 0, string file_ = "", int line_=0)
+        public sc_report(sc_severity severity_, sc_msg_def md_, string msg_, int verbosity_level = 0, string file_ = "", int line_ = 0, string member = "")
         {
             severity = severity_;
             md = md_;
             msg = msg_;
             file = file_;
             line = line_;
-            timestamp = new sc_time();
-            process = null;
-            m_verbosity_level = verbosity_level;
-            m_what = sc_report_compose_message(this);
+            this.member = member;
+            timeStamp = new sc_time();
+            sender = null;
+            mVerbosityLevel = verbosity_level;
+            mWhat = sc_report_compose_message(this);
         }
         public sc_report(sc_report other)
         {
@@ -160,16 +191,17 @@ namespace sc_core
             msg = other.msg;
             file = other.file;
             line = other.line;
-            timestamp = new sc_time(other.timestamp);
-            process = other.process;
-            m_verbosity_level = other.m_verbosity_level;
-            m_what = other.m_what;
+            member = other.member;
+            timeStamp = new sc_time(other.timeStamp);
+            sender = other.sender;
+            mVerbosityLevel = other.mVerbosityLevel;
+            mWhat = other.mWhat;
         }
 
         public static string sc_report_compose_message(sc_report rep)
         {
             StringBuilder res = new StringBuilder();
-            
+
 
             res.AppendFormat("{0} : ", System.Enum.GetName((rep.severity).GetType(), rep.severity));
 
@@ -178,22 +210,20 @@ namespace sc_core
             {
                 res.AppendFormat("id:{0}", rep.get_id());
             }
+            res.AppendFormat("{0}: {1}: {2}:", rep.File, rep.Line, rep.Member);
+
             res.AppendFormat("{0} ", rep.get_msg_type());
 
-            string msg = rep.get_msg();
+            string msg = rep.Message;
             if (string.IsNullOrEmpty(msg) == false)
             {
                 res.AppendFormat(": {0} ", msg);
             }
-            string what = rep.m_what;
-            if (string.IsNullOrEmpty(what) == false)
+            if (rep.Severity > sc_severity.SC_INFO)
             {
-                res.AppendFormat(": {0} ", what);
+                res.AppendFormat("\nIn process:{0}", rep.SenderName);
             }
-            if (rep.get_severity() > sc_severity.SC_INFO)
-            {
-                res.AppendFormat("\nIn file: {0} : {1}\nIn process:{2}", rep.get_file_name(), rep.get_line_number(), rep.get_process_name());
-            }
+            res.AppendLine();
 
             return res.ToString();
         }
@@ -202,6 +232,7 @@ namespace sc_core
         {
             return md.msg_type;
         }
+
         public void register_id(int id, string msg)
         {
             if (id < 0)
@@ -232,6 +263,7 @@ namespace sc_core
             }
             md.id = id;
         }
+
         public string get_message(int id)
         {
             sc_msg_def md = sc_report_handler.mdlookup(id);
@@ -242,22 +274,22 @@ namespace sc_core
         {
             sc_msg_def md = sc_report_handler.mdlookup(id);
 
-            return md != null ? md.actions == (int)ReportAction.SC_DO_NOTHING : false; // only do-nothing set
+            return md != null ? md.actions == (int)sc_report_action.SC_DO_NOTHING : false; // only do-nothing set
         }
         public void suppress_id(int id_, bool suppress)
         {
             sc_msg_def md = sc_report_handler.mdlookup(id_);
 
             if (md != null)
-                md.actions = suppress ? (uint)ReportAction.SC_DO_NOTHING : (uint)ReportAction.SC_UNSPECIFIED;
+                md.actions = suppress ? (uint)sc_report_action.SC_DO_NOTHING : (uint)sc_report_action.SC_UNSPECIFIED;
         }
         public void suppress_infos(bool suppress)
         {
-            sc_report_handler.sev_actions[(int)sc_severity.SC_INFO] = suppress ? (uint)ReportAction.SC_DO_NOTHING : (uint)ReportAction.SC_LOG | (uint)ReportAction.SC_DISPLAY;
+            sc_report_handler.sev_actions[(int)sc_severity.SC_INFO] = suppress ? (uint)sc_report_action.SC_DO_NOTHING : (uint)sc_report_action.SC_LOG | (uint)sc_report_action.SC_DISPLAY;
         }
         public void suppress_warnings(bool suppress)
         {
-            sc_report_handler.sev_actions[(int)sc_severity.SC_WARNING] = suppress ? (uint)ReportAction.SC_DO_NOTHING : (uint)ReportAction.SC_LOG | (uint)ReportAction.SC_DISPLAY;
+            sc_report_handler.sev_actions[(int)sc_severity.SC_WARNING] = suppress ? (uint)sc_report_action.SC_DO_NOTHING : (uint)sc_report_action.SC_LOG | (uint)sc_report_action.SC_DISPLAY;
         }
         public void make_warnings_errors(bool flag)
         {

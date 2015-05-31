@@ -17,6 +17,7 @@
 
 
 using System;
+using System.Collections.Generic;
 namespace sc_core
 {
 
@@ -29,7 +30,7 @@ namespace sc_core
     public class sc_msg_def
     {
         public string msg_type;
-        public uint actions;
+        public uint actions = (int)sc_report_action.SC_DISPLAY;
         public uint[] sev_actions = new uint[(int)sc_severity.SC_MAX_SEVERITY];
         public uint limit;
         public uint[] sev_limit = new uint[(int)sc_severity.SC_MAX_SEVERITY];
@@ -41,7 +42,7 @@ namespace sc_core
         public int id; // backward compatibility with 2.0+
     }
 
-    public partial class sc_report_handler
+    public static class sc_report_handler
     {
         public const string SC_ID_REGISTER_ID_FAILED_ = "register_id failed";
         public const string SC_ID_UNKNOWN_ERROR_ = "unknown error";
@@ -53,35 +54,23 @@ namespace sc_core
 
         public delegate void sc_report_handler_proc(sc_report NamelessParameter1, uint NamelessParameter2);
 
-        public void report(sc_severity severity_, int id_, string msg_, string file_, int line_)
+        static sc_report_handler()
         {
-            sc_msg_def md = sc_report_handler.mdlookup(id_);
-
-            if (md == null)
-            {
-                md = sc_report_handler.add_msg_type("unknown_id");
-                md.id = id_;
-            }
-
-            if (severity_ == sc_severity.SC_WARNING && sc_report.warnings_are_errors)
-                severity_ = sc_severity.SC_ERROR;
-
-            uint actions = execute(md, severity_);
-            sc_report rep = new sc_report(severity_, md, msg_);
-
-            if ((actions & (uint)ReportAction.SC_CACHE_REPORT) != 0)
-                cache_report(rep);
-
-            if (severity_ == sc_severity.SC_ERROR)
-                actions |= (uint)ReportAction.SC_THROW;
-            else if (severity_ == sc_severity.SC_FATAL)
-                actions |= (uint)ReportAction.SC_ABORT;
-
-            handler(rep, actions);
+            initialize();
         }
 
-
         public static void report(sc_severity severity_, string msg_type_, string msg_)
+        {
+            string file = new System.Diagnostics.StackTrace(true).GetFrame(1).GetFileName();
+            string member = new System.Diagnostics.StackTrace(true).GetFrame(1).GetMethod().Name;
+            int line = new System.Diagnostics.StackTrace(true).GetFrame(1).GetFileLineNumber();
+            report(severity_, msg_type_, msg_, file, member, line);
+        }
+
+        public static void report(sc_severity severity_, string msg_type_, string msg_,
+                        string file = "",
+                        string member = "",
+                        int line = 0)
         {
             sc_msg_def md = mdlookup(msg_type_);
 
@@ -98,34 +87,9 @@ namespace sc_core
                 md = add_msg_type(msg_type_);
 
             uint actions = execute(md, severity_);
-            sc_report rep = new sc_report(severity_, md, msg_);
+            sc_report rep = new sc_report(severity_, md, msg_, 0, file, line, member);
 
-            if ((actions & (uint)ReportAction.SC_CACHE_REPORT) != 0)
-                cache_report(new sc_report(rep));
-
-            handler(rep, actions);
-        }
-
-        public static void report(sc_severity severity_, string msg_type_, string msg_, int verbosity_, string file_, int line_)
-        {
-            sc_msg_def md = mdlookup(msg_type_);
-
-            // If the severity of the report is SC_INFO and the specified verbosity
-            // level is greater than the maximum verbosity level of the simulator then
-            // return without any action.
-
-            if ((severity_ == sc_severity.SC_INFO) && (verbosity_ > verbosity_level))
-                return;
-
-            // Process the report:
-
-            if (md == null)
-                md = add_msg_type(msg_type_);
-
-            uint actions = execute(md, severity_);
-            sc_report rep = new sc_report(severity_, md, msg_, verbosity_);
-
-            if ((actions & (uint)ReportAction.SC_CACHE_REPORT) != 0)
+            if ((actions & (uint)sc_report_action.SC_CACHE_REPORT) != 0)
                 cache_report(new sc_report(rep));
 
             handler(rep, actions);
@@ -133,7 +97,7 @@ namespace sc_core
 
         public static uint set_actions(sc_severity severity_)
         {
-            return set_actions(severity_, (uint)ReportAction.SC_UNSPECIFIED);
+            return set_actions(severity_, (uint)sc_report_action.SC_UNSPECIFIED);
         }
 
         public static uint set_actions(sc_severity severity_, uint actions_)
@@ -145,7 +109,7 @@ namespace sc_core
 
         public static uint set_actions(string msg_type_)
         {
-            return set_actions(msg_type_, (uint)ReportAction.SC_UNSPECIFIED);
+            return set_actions(msg_type_, (uint)sc_report_action.SC_UNSPECIFIED);
         }
 
         public static uint set_actions(string msg_type_, uint actions_)
@@ -163,7 +127,7 @@ namespace sc_core
 
         public static uint set_actions(string msg_type_, sc_severity severity_)
         {
-            return set_actions(msg_type_, severity_, (uint)ReportAction.SC_UNSPECIFIED);
+            return set_actions(msg_type_, severity_, (uint)sc_report_action.SC_UNSPECIFIED);
         }
 
         public static uint set_actions(string msg_type_, sc_severity severity_, uint actions_)
@@ -305,17 +269,18 @@ namespace sc_core
             sev_call_count[(int)sc_severity.SC_FATAL] = 0;
 
             //ORIGINAL LINE: msg_def_items * items = messages;
-            msg_def_items items = sc_report_handler.messages;
-
-            while (items != sc_report_handler.msg_terminator)
+            foreach (msg_def_items items in sc_report_handler.messages)
             {
-                for (int i = 0; i < items.count; ++i)
+                while (items != sc_report_handler.msg_terminator)
                 {
-                    items.md[i].call_count = 0;
-                    items.md[i].sev_call_count[(int)sc_severity.SC_INFO] = 0;
-                    items.md[i].sev_call_count[(int)sc_severity.SC_WARNING] = 0;
-                    items.md[i].sev_call_count[(int)sc_severity.SC_ERROR] = 0;
-                    items.md[i].sev_call_count[(int)sc_severity.SC_FATAL] = 0;
+                    for (int i = 0; i < items.MessageDefinitions.Count; ++i)
+                    {
+                        items.MessageDefinitions[i].call_count = 0;
+                        items.MessageDefinitions[i].sev_call_count[(int)sc_severity.SC_INFO] = 0;
+                        items.MessageDefinitions[i].sev_call_count[(int)sc_severity.SC_WARNING] = 0;
+                        items.MessageDefinitions[i].sev_call_count[(int)sc_severity.SC_ERROR] = 0;
+                        items.MessageDefinitions[i].sev_call_count[(int)sc_severity.SC_FATAL] = 0;
+                    }
                 }
             }
         }
@@ -328,11 +293,8 @@ namespace sc_core
             last_global_report = null;
             sc_report_handler.sc_report_close_default_log();
 
-            msg_def_items items = sc_report_handler.messages;
-            msg_def_items newitems = sc_report_handler.msg_terminator;
-            sc_report_handler.messages = sc_report_handler.msg_terminator;
-
-            sc_report_handler.messages = newitems;
+            sc_report_handler.messages.Clear();
+            sc_report_handler.messages.Add(sc_report_handler.msg_terminator);
         }
 
         private static void sc_report_close_default_log()
@@ -354,23 +316,23 @@ namespace sc_core
 
         public static void default_handler(sc_report rep, uint actions)
         {
-            if ((actions & (uint)ReportAction.SC_DISPLAY) != 0)
+            if ((actions & (uint)sc_report_action.SC_DISPLAY) != 0)
                 Console.WriteLine(sc_report.sc_report_compose_message(new sc_report(rep)));
 
 
 
-            if ((actions & (uint)ReportAction.SC_STOP) != 0)
+            if ((actions & (uint)sc_report_action.SC_STOP) != 0)
             {
-                sc_stop_here.stop_here(rep.get_msg_type(), rep.get_severity());
+                sc_stop_here.stop_here(rep.get_msg_type(), rep.Severity);
                 sc_simcontext.sc_stop();
             }
-            if ((actions & (uint)ReportAction.SC_INTERRUPT) != 0)
-                sc_stop_here.interrupt_here(rep.get_msg_type(), rep.get_severity());
+            if ((actions & (uint)sc_report_action.SC_INTERRUPT) != 0)
+                sc_stop_here.interrupt_here(rep.get_msg_type(), rep.Severity);
 
-            if ((actions & (uint)ReportAction.SC_ABORT) != 0)
+            if ((actions & (uint)sc_report_action.SC_ABORT) != 0)
                 System.Environment.Exit(1);
 
-            if ((actions & (uint)ReportAction.SC_THROW) != 0)
+            if ((actions & (uint)sc_report_action.SC_THROW) != 0)
             {
                 sc_process_b proc_p = sc_simcontext.sc_get_current_process_b();
                 if (proc_p != null && proc_p.is_unwinding())
@@ -389,7 +351,7 @@ namespace sc_core
                     return p;
                 }
             }
-            return (uint)ReportAction.SC_UNSPECIFIED;
+            return (uint)sc_report_action.SC_UNSPECIFIED;
         }
 
         public static sc_report get_cached_report()
@@ -437,23 +399,32 @@ namespace sc_core
 
         public class msg_def_items
         {
-            public sc_msg_def[] md; // have to point to sc_msg_def-s
-            public int count; // set to number of items in md[]
-            public bool allocated; // used internally, previous value ignored
-            public msg_def_items next; // used internally, previous value ignored
-
-            internal void Dispose()
+            private List<sc_msg_def> md;
+            public List<sc_msg_def> MessageDefinitions
             {
-                throw new NotImplementedException();
+                get { return md; }
+                set { md = value; }
+            }
+
+            public msg_def_items()
+            {
+                md = new List<sc_msg_def>();
+            }
+
+            private bool allocated; // used internally, previous value ignored
+            public bool IsAllocated
+            {
+                get { return allocated; }
+                set { allocated = value; }
             }
         }
 
         public static void add_static_msg_types(msg_def_items items)
         {
-            items.allocated = false;
-            items.next = sc_report_handler.messages;
-            sc_report_handler.messages = items;
+            items.IsAllocated = false;
+            sc_report_handler.messages.Add(items);
         }
+
         public static sc_msg_def add_msg_type(string msg_type_)
         {
             sc_msg_def md = mdlookup(msg_type_);
@@ -467,23 +438,12 @@ namespace sc_core
             if (items == null)
                 return null;
 
-            items.count = 1;
-            items.md = new sc_msg_def[items.count];
-
-            if (items.md == null)
-            {
-                if (items != null)
-                    items.Dispose();
-                return null;
-            }
-
             msg_type_len = msg_type_.Length;
             if (msg_type_len > 0)
             {
-                if (items.md[0] == null)
-                    items.md[0] = new sc_msg_def();
-                items.md[0].msg_type_data = msg_type_;
-                items.md[0].id = -1; // backward compatibility with 2.0+
+                items.MessageDefinitions.Add(new sc_msg_def());
+                items.MessageDefinitions[0].msg_type_data = msg_type_;
+                items.MessageDefinitions[0].id = -1; // backward compatibility with 2.0+
             }
             else
             {
@@ -491,13 +451,13 @@ namespace sc_core
                 return null;
             }
             add_static_msg_types(items);
-            items.allocated = true;
+            items.IsAllocated = true;
 
-            return items.md[0];
+            return items.MessageDefinitions[0];
         }
 
 
-        protected static void cache_report(sc_report rep)
+        private static void cache_report(sc_report rep)
         {
             sc_process_b proc = sc_simcontext.sc_get_current_process_b();
             if (proc != null)
@@ -513,20 +473,20 @@ namespace sc_core
         }
 
         // The calculation of actions to be executed
-        protected static uint execute(sc_msg_def md, sc_severity severity_)
+        private static uint execute(sc_msg_def md, sc_severity severity_)
         {
             uint actions = md.sev_actions[(int)severity_]; // high prio
 
-            if ((int)ReportAction.SC_UNSPECIFIED == actions) // middle prio
+            if ((int)sc_report_action.SC_UNSPECIFIED == actions) // middle prio
                 actions = md.actions;
 
-            if ((int)ReportAction.SC_UNSPECIFIED == actions) // the lowest prio
+            if ((int)sc_report_action.SC_UNSPECIFIED == actions) // the lowest prio
                 actions = sev_actions[(int)severity_];
 
             actions &= ~suppress_mask; // higher than the high prio
             actions |= force_mask; // higher than above, and the limit is the highest
 
-            actions &= (uint)ReportAction.SC_DISPLAY;
+            //actions &= (uint)ReportAction.SC_DISPLAY;
 
             uint limit = 0;
 
@@ -562,25 +522,25 @@ namespace sc_core
             else if (limit != uint.MaxValue)
             {
                 if ((call_count >= limit) && ((severity_ == sc_severity.SC_ERROR) || (severity_ == sc_severity.SC_FATAL)))
-                    actions |= (uint)ReportAction.SC_STOP; // force sc_stop()
+                    actions |= (uint)sc_report_action.SC_STOP; // force sc_stop()
             }
             return actions;
         }
 
-        protected static uint suppress_mask = 0;
-        protected static uint force_mask = 0;
+        private static uint suppress_mask = 0;
+        private static uint force_mask = 0;
         public static uint[] sev_actions = new uint[(int)sc_severity.SC_MAX_SEVERITY];
-        protected static uint[] sev_limit = new uint[(int)sc_severity.SC_MAX_SEVERITY];
-        protected static uint[] sev_call_count = new uint[(int)sc_severity.SC_MAX_SEVERITY];
-        protected static sc_report last_global_report = null;
-        protected static uint available_actions = (uint)(ReportAction.SC_DO_NOTHING | ReportAction.SC_THROW | ReportAction.SC_LOG | ReportAction.SC_DISPLAY | ReportAction.SC_CACHE_REPORT | ReportAction.SC_INTERRUPT | ReportAction.SC_STOP | ReportAction.SC_ABORT);
-        protected static string log_file_name = "";
-        protected static int verbosity_level = (int)sc_verbosity.SC_MEDIUM;
+        private static uint[] sev_limit = new uint[(int)sc_severity.SC_MAX_SEVERITY];
+        private static uint[] sev_call_count = new uint[(int)sc_severity.SC_MAX_SEVERITY];
+        private static sc_report last_global_report = null;
+        private static uint available_actions = (uint)(sc_report_action.SC_DO_NOTHING | sc_report_action.SC_THROW | sc_report_action.SC_LOG | sc_report_action.SC_DISPLAY | sc_report_action.SC_CACHE_REPORT | sc_report_action.SC_INTERRUPT | sc_report_action.SC_STOP | sc_report_action.SC_ABORT);
+        private static string log_file_name = "";
+        private static int verbosity_level = (int)sc_verbosity.SC_MEDIUM;
 
-        protected static msg_def_items messages;
-        protected static msg_def_items msg_terminator = new msg_def_items();
+        private static List<msg_def_items> messages = new List<msg_def_items>();
+        private static msg_def_items msg_terminator = new msg_def_items();
 
-        protected static sc_report_handler_proc handler = sc_report_handler.default_handler;
+        private static sc_report_handler_proc handler = sc_report_handler.default_handler;
 
 
         //
@@ -593,11 +553,11 @@ namespace sc_core
             if (string.IsNullOrEmpty(msg_type_)) // if msg_type is NULL, report unknown error
                 return null;
 
-            for (msg_def_items item = sc_report_handler.messages; item != null; item = item.next)
+            foreach (msg_def_items item in sc_report_handler.messages)
             {
-                for (int i = 0; i < item.count; ++i)
-                    if (!string.Equals(msg_type_, item.md[i].msg_type))
-                        return item.md[i];
+                for (int i = 0; i < item.MessageDefinitions.Count; ++i)
+                    if (!string.Equals(msg_type_, item.MessageDefinitions[i].msg_type))
+                        return item.MessageDefinitions[i];
             }
             return null;
         }
@@ -605,11 +565,11 @@ namespace sc_core
 
         public static sc_msg_def mdlookup(int id)
         {
-            for (msg_def_items item = sc_report_handler.messages; item != null; item = item.next)
+            foreach (msg_def_items item in sc_report_handler.messages)
             {
-                for (int i = 0; i < item.count; ++i)
-                    if (id == item.md[i].id)
-                        return item.md[i];
+                for (int i = 0; i < item.MessageDefinitions.Count; ++i)
+                    if (id == item.MessageDefinitions[i].id)
+                        return item.MessageDefinitions[i];
             }
             return null;
         }

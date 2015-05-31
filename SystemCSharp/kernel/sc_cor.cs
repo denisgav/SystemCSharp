@@ -216,7 +216,7 @@ namespace sc_core
             sc_cor from_p = activeCoroutine;
             sc_cor to_p = next_cor;
 
-            Console.WriteLine("Switch from {0} to {1}", (from_p.Parent != null) ? from_p.Parent.name() : "NULL", (to_p.Parent != null) ? to_p.Parent.name() : "NULL");
+            //Console.WriteLine("Switch from {0} to {1}", (from_p.Parent != null) ? from_p.Parent.name() : "NULL", (to_p.Parent != null) ? to_p.Parent.name() : "NULL");
 
             if (to_p != from_p)
             {
@@ -227,9 +227,9 @@ namespace sc_core
                     from_p.AutoEvent.Reset();
                     to_p.AutoEvent.Set();
                 }
-                Console.WriteLine("From {0} wait one", (from_p.Parent != null) ? from_p.Parent.name() : "NULL");
+                //Console.WriteLine("From {0} wait one", (from_p.Parent != null) ? from_p.Parent.name() : "NULL");
                 from_p.AutoEvent.WaitOne();
-                Console.WriteLine("From {0} wait done", (from_p.Parent != null) ? from_p.Parent.name() : "NULL");
+                //Console.WriteLine("From {0} wait done", (from_p.Parent != null) ? from_p.Parent.name() : "NULL");
             }
 
             lock (mainCor)
@@ -238,7 +238,7 @@ namespace sc_core
                 activeCoroutine = from_p; // When we come out of wait make ourselves active.
             }
 
-            Console.WriteLine("Switch from {0} to {1} Done.", (from_p.Parent != null) ? from_p.Parent.name() : "NULL", (to_p.Parent != null) ? to_p.Parent.name() : "NULL");
+            //Console.WriteLine("Switch from {0} to {1} Done.", (from_p.Parent != null) ? from_p.Parent.name() : "NULL", (to_p.Parent != null) ? to_p.Parent.name() : "NULL");
         }
 
         // abort the current coroutine (and resume the next coroutine)
@@ -246,7 +246,7 @@ namespace sc_core
         {
             //next_cor.Mutex.WaitOne();
             //next_cor.Mutex.ReleaseMutex();
-            Console.WriteLine("Thread abort:", (next_cor.Parent != null) ? next_cor.Parent.name() : "NULL");
+            //Console.WriteLine("Thread abort:", (next_cor.Parent != null) ? next_cor.Parent.name() : "NULL");
             next_cor.AutoEvent.Set();
             //next_cor.Thread.Abort();
             //next_cor.Dispose();
