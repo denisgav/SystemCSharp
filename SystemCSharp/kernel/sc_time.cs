@@ -241,7 +241,7 @@ namespace sc_core
         public static sc_time from_value(ulong v)
         {
             sc_time t = new sc_time();
-            if (v != 0 && !(DefineConstants.SC_MAXTIME_ALLOWED_ != 0))
+            if (v != 0 && !(sc_constants.SC_MAXTIME_ALLOWED_ != 0))
             {
                 sc_time_params time_params = sc_simcontext.sc_get_curr_simcontext().m_time_params;
                 time_params.time_resolution_fixed = true;

@@ -218,7 +218,7 @@ namespace sc_core
             m_trigger_type = trigger_t.STATIC;
             m_unwinding = false;
             m_last_created_process_p = this;
-            m_timeout_event_p = new sc_event((DefineConstants.SC_KERNEL_EVENT_PREFIX + "_free_event"));
+            m_timeout_event_p = new sc_event((sc_constants.SC_KERNEL_EVENT_PREFIX + "_free_event"));
         }
 
 
@@ -273,7 +273,7 @@ namespace sc_core
         {
             if (m_reset_event_p == null)
             {
-                m_reset_event_p = new sc_event(((string)DefineConstants.SC_KERNEL_EVENT_PREFIX + "_reset_event"));
+                m_reset_event_p = new sc_event(((string)sc_constants.SC_KERNEL_EVENT_PREFIX + "_reset_event"));
             }
             return m_reset_event_p;
         }
@@ -281,7 +281,7 @@ namespace sc_core
         {
             if (m_term_event_p == null)
             {
-                m_term_event_p = new sc_event(((string)DefineConstants.SC_KERNEL_EVENT_PREFIX + "_term_event"));
+                m_term_event_p = new sc_event(((string)sc_constants.SC_KERNEL_EVENT_PREFIX + "_term_event"));
             }
             return m_term_event_p;
         }

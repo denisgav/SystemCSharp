@@ -31,7 +31,7 @@ namespace sc_core
         //------------------------------------------------------------------------------
         public sc_join()
         {
-            m_join_event = new sc_event(((string)DefineConstants.SC_KERNEL_EVENT_PREFIX + "_join_event"));
+            m_join_event = new sc_event(((string)sc_constants.SC_KERNEL_EVENT_PREFIX + "_join_event"));
             m_threads_n = 0;
         }
 

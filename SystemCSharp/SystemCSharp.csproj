@@ -44,6 +44,7 @@
     <Compile Include="datatypes\bit\sc_logic.cs" />
     <Compile Include="datatypes\misc\sc_value_base.cs" />
     <Compile Include="kernel\sc_attribute.cs" />
+    <Compile Include="kernel\sc_constants.cs" />
     <Compile Include="kernel\sc_cor.cs" />
     <Compile Include="kernel\sc_cthread_process.cs" />
     <Compile Include="kernel\sc_event.cs" />
