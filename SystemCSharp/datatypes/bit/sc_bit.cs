@@ -248,6 +248,11 @@ namespace sc_dt
             return m_val == els.m_val;
         }
 
+        public override int GetHashCode()
+        {
+            return m_val.GetHashCode();
+        }
+
 
         private bool m_val;
     }

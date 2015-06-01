@@ -172,7 +172,9 @@ namespace sc_core
         public static List<sc_object> empty_object_vector = new List<sc_object>();
         public static sc_process_b m_last_created_process_p = null;
 
-        private static sc_process_b sc_process_b_m_last_created_process_p;
+        //\/\/\/\/\/\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/
+        //private static sc_process_b sc_process_b_m_last_created_process_p;
+        //\/\/\/\/\/\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/
 
 
         public sc_process_b(string name_p, bool is_thread, bool free_host, sc_process_call_base method_p, sc_process_host host_p, sc_spawn_options opt_p)

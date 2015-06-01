@@ -797,8 +797,6 @@ namespace sc_core
         }
 
 
-        private bool delta_count_warn_delta_count = true;
-
         public ulong delta_count()
         {
             global::sc_core.sc_report_handler.report(sc_core.sc_severity.SC_INFO, "/IEEE_Std_1666/deprecated", "sc_simcontext::delta_count() is deprecated, use sc_delta_count()");
@@ -1284,6 +1282,13 @@ namespace sc_core
                     {
                         if (stop_mode == sc_stop_mode.SC_STOP_IMMEDIATE)
                             goto ___out;
+                    }
+
+                    // check for possible infinite loops
+                    if (++num_deltas > sc_constants.SC_MAX_NUM_DELTA_CYCLES)
+                    {
+                        Console.Error.WriteLine("SystemC warning: the number of delta cycles exceeds the limit of SC_MAX_NUM_DELTA_CYCLES = {0}, defined in sc_constants.cs.\nThis is a possible sign of an infinite loop.\nIncrease the limit if this warning is invalid.\n", sc_constants.SC_MAX_NUM_DELTA_CYCLES);
+                        break;
                     }
 
                     // no more runnable processes

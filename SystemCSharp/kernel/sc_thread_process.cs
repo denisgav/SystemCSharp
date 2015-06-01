@@ -68,7 +68,6 @@ namespace sc_core
                 case process_throw_type.THROW_USER:
                     m_throw_status = m_active_areset_n != 0 ? process_throw_type.THROW_ASYNC_RESET : process_throw_type.THROW_SYNC_RESET;
                     throw new sc_unwind_exception(this, true);
-                    break;
 
                 case process_throw_type.THROW_KILL:
                     throw new sc_unwind_exception(this, false);
@@ -893,17 +892,14 @@ namespace sc_core
             return "sc_thread_process";
         }
 
-        sc_thread_process m_exist_p;
-        sc_thread_process m_runnable_p;
-
         public virtual sc_thread_process next_exist()
         {
-            return m_exist_p;
+            return (sc_thread_process)m_exist_p;
         }
 
         public virtual sc_thread_process next_runnable()
         {
-            return m_runnable_p;
+            return (sc_thread_process)m_runnable_p;
         }
 
         public virtual sc_cor get_cor()

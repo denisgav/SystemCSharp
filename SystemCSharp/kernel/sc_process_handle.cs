@@ -39,6 +39,11 @@ namespace sc_core
             return (els.m_target_p == m_target_p);
         }
 
+        public override int GetHashCode()
+        {
+            return m_target_p.GetHashCode();
+        }
+
         public static bool operator ==(sc_process_handle left, sc_process_handle right)
         {
             return (left.m_target_p != null) && (right.m_target_p != null) &&

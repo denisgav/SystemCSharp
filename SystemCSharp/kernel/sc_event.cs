@@ -531,8 +531,8 @@ namespace sc_core
         // +----------------------------------------------------------------------------
         public virtual void trigger()
         {
-            int last_i; // index of last element in vector now accessing.
-            int size; // size of vector now accessing.
+            //int last_i; // index of last element in vector now accessing.
+            //int size; // size of vector now accessing.
 
 
             // trigger the static sensitive methods

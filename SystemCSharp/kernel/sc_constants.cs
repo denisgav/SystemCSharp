@@ -95,5 +95,6 @@ namespace sc_core
         public const string PRIu64 = "I64u";
         public const int SC_MAXTIME_ALLOWED_ = 1;
         public const int SC_DISABLE_COPYRIGHT_MESSAGE = 0;
+        public const int SC_MAX_NUM_DELTA_CYCLES = 10000;
     }
 }

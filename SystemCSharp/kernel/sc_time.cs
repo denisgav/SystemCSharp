@@ -31,7 +31,7 @@ namespace sc_core
         SC_SEC
     }
 
-    public class sc_time
+    public class sc_time : IComparable, IComparable<sc_time>, IComparable<ulong>, IComparable<double> , IComparable<float>
     {
 
         public static readonly sc_time SC_ZERO_TIME = new sc_time();
@@ -250,7 +250,6 @@ namespace sc_core
             return t;
         }
 
-        private bool sc_time_warn_constructor = true;
         public sc_time(double v, bool scale)
         {
             m_value = 0;
@@ -376,6 +375,11 @@ namespace sc_core
                 return m_value == els.m_value;
         }
 
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
+        }
+
         public static bool operator ==(sc_time t1, sc_time t2)
         {
             // If both are null, or both are same instance, return true.
@@ -479,6 +483,79 @@ namespace sc_core
 
 
         private ulong m_value;
+
+        /// <summary>
+        /// Compare to other sc_time instance
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public int CompareTo(sc_time other)
+        {
+            return m_value.CompareTo(other.m_value);
+        }
+
+        /// <summary>
+        /// Compare to other ulong instance
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public int CompareTo(ulong other)
+        {
+            return m_value.CompareTo(other);
+        }
+
+        /// <summary>
+        /// Compare to other double instance
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public int CompareTo(double other)
+        {
+            return m_value.CompareTo(other);
+        }
+
+        /// <summary>
+        /// Compare to other float instance
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public int CompareTo(float other)
+        {
+            return m_value.CompareTo(other);
+        }
+
+        /// <summary>
+        /// Compare to other object instance
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public int CompareTo(object obj)
+        {
+            if (obj == null) return -1;
+            if (obj is sc_time)
+            {
+                sc_time els = obj as sc_time;
+                return m_value.CompareTo(els.m_value);
+            }
+            if (obj is double)
+            {
+                double els = (double)obj;
+                return m_value.CompareTo(els);
+            }
+
+            if (obj is float)
+            {
+                float els = (float)obj;
+                return m_value.CompareTo(els);
+            }
+
+            if (obj is ulong)
+            {
+                ulong els = (ulong)obj;
+                return m_value.CompareTo(els);
+            }
+            return -1;
+        }
     }
 
 

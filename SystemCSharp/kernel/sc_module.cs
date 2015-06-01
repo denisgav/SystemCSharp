@@ -210,8 +210,9 @@ namespace sc_core
             m_module_name_p = null;
             //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
             //m_port_vec = new List<sc_port_base>();
+            //m_port_index = 0;
             //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-            m_port_index = 0;
+            
             m_name_gen = new sc_name_gen();
         }
 
@@ -691,8 +692,8 @@ namespace sc_core
         private bool m_end_module_called;
         //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
         //private List<sc_port_base> m_port_vec;
+        //private int m_port_index;
         //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-        private int m_port_index;
         private sc_name_gen m_name_gen;
         private sc_module_name m_module_name_p;
 
