@@ -17,7 +17,7 @@
 
 namespace sc_dt
 {
-    public partial class sc_bit
+    public class sc_bit
     {
         // support methods
 

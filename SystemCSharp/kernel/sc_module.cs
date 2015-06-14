@@ -20,7 +20,7 @@ using System.Collections.Generic;
 
 namespace sc_core
 {
-    /*
+    
     public class sc_bind_proxy
     {
         public sc_interface iface;
@@ -28,21 +28,21 @@ namespace sc_core
 
         public sc_bind_proxy()
         {
-            iface = 0;
-            port = 0;
+            iface = null;
+            port = null;
         }
         public sc_bind_proxy(sc_interface iface_)
         {
             iface = iface_;
-            port = 0;
+            port = null;
         }
         public sc_bind_proxy(sc_port_base port_)
         {
-            iface = 0;
+            iface = null;
             port = port_;
         }
     }
-    */
+    
 
     // ----------------------------------------------------------------------------
     //  CLASS : sc_module_dynalloc_list
@@ -101,15 +101,7 @@ namespace sc_core
             return module_;
         }
 
-        //-----------------------------------------------------------------------------
-        //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-        //public static readonly sc_bind_proxy SC_BIND_PROXY_NIL = new sc_bind_proxy();
-        //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-        //-----------------------------------------------------------------------------
-
-        
-
-        // to generate unique names for objects in an MT-Safe way
+        public static readonly sc_bind_proxy SC_BIND_PROXY_NIL = new sc_bind_proxy();
 
         // to generate unique names for objects in an MT-Safe way
 
@@ -169,8 +161,6 @@ namespace sc_core
 
         // called by start_simulation (does nothing by default)
 
-        // called by start_simulation (does nothing by default)
-
         public virtual void start_of_simulation()
         {
         }
@@ -180,8 +170,6 @@ namespace sc_core
             hierarchy_scope scope = new hierarchy_scope(this);
             start_of_simulation();
         }
-
-        // called by simulation_done (does nothing by default)
 
         // called by simulation_done (does nothing by default)
 
@@ -208,10 +196,8 @@ namespace sc_core
             simcontext().hierarchy_push(this);
             m_end_module_called = false;
             m_module_name_p = null;
-            //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-            //m_port_vec = new List<sc_port_base>();
-            //m_port_index = 0;
-            //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+            m_port_vec = new List<sc_port_base>();
+            m_port_index = 0;
             
             m_name_gen = new sc_name_gen();
         }
@@ -258,14 +244,13 @@ namespace sc_core
             //--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             //--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-            /*
+            
             sc_module_name mod_name = simcontext().get_object_manager().top_of_module_name_stack();
             if (null == mod_name || null != mod_name.name())
                 sc_core.sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "an sc_module_name parameter for your constructor is required", "");
             sc_module_init();
             mod_name.set_module(this);
             m_module_name_p = mod_name; // must come after sc_module_init call.
-            */
         }
 
         public void defunct()
@@ -316,9 +301,7 @@ namespace sc_core
 
         public override void Dispose()
         {
-            //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-            //m_port_vec = null;
-            //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+            m_port_vec = null;
             orphan_child_objects();
             if (m_module_name_p != null)
             {
@@ -339,18 +322,16 @@ namespace sc_core
                 //                was not called for a previous module.
                 sc_simcontext.sc_get_curr_simcontext().hierarchy_pop();
                 sc_simcontext.sc_get_curr_simcontext().reset_curr_proc();
-                //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-                //sensitive.reset();
-                //sensitive_pos.reset();
-                //sensitive_neg.reset();
-                //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+                /*
+                sensitive.reset();
+                sensitive_pos.reset();
+                sensitive_neg.reset();
+                */
                 m_end_module_called = true;
                 m_module_name_p = null; // make sure we are not called in ~sc_module().
             }
         }
 
-
-        // to prevent initialization for SC_METHODs and SC_THREADs
 
         // to prevent initialization for SC_METHODs and SC_THREADs
 
@@ -362,8 +343,6 @@ namespace sc_core
 
         // positional binding code - used by operator ()
         //---------------------------------------------------------------------------------
-        //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-        /*
         protected void positional_bind(sc_interface interface_)
         {
             if (m_port_index == (int)m_port_vec.Count)
@@ -392,6 +371,7 @@ namespace sc_core
             }
             ++m_port_index;
         }
+
         protected void positional_bind(sc_port_base port_)
         {
             if (m_port_index == (int)m_port_vec.Count)
@@ -419,9 +399,6 @@ namespace sc_core
             }
             ++m_port_index;
         }
-        */
-        //---------------------------------------------------------------------------------
-        //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
         // set reset sensitivity for SC_xTHREADs
 
@@ -649,14 +626,11 @@ namespace sc_core
         */
         // These are protected so that user derived classes can refer to them.
 
-        //---------------------------------------------------------------------------------
-        //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-        //protected sc_sensitive sensitive = new sc_sensitive();
-        //protected sc_sensitive_pos sensitive_pos = new sc_sensitive_pos();
-        //protected sc_sensitive_neg sensitive_neg = new sc_sensitive_neg();
-        //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-        //---------------------------------------------------------------------------------
-
+        /*
+        protected sc_sensitive sensitive = new sc_sensitive();
+        protected sc_sensitive_pos sensitive_pos = new sc_sensitive_pos();
+        protected sc_sensitive_neg sensitive_neg = new sc_sensitive_neg();
+        */
         // Function to set the stack size of the current (c)thread process.
         protected void set_stack_size(uint size)
         {
@@ -675,25 +649,18 @@ namespace sc_core
             }
         }
 
-        //---------------------------------------------------------------------------------
-        //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-        /*
-        protected int append_port(sc_port_base port_)
+        
+        public int append_port(sc_port_base port_)
         {
             int index = m_port_vec.Count;
             m_port_vec.Add(port_);
             return index;
         }
-        */
-        //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-        //---------------------------------------------------------------------------------
 
 
         private bool m_end_module_called;
-        //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-        //private List<sc_port_base> m_port_vec;
-        //private int m_port_index;
-        //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        private List<sc_port_base> m_port_vec;
+        private int m_port_index;
         private sc_name_gen m_name_gen;
         private sc_module_name m_module_name_p;
 

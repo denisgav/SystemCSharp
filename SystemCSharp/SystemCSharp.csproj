@@ -12,6 +12,7 @@
     <AssemblyName>SystemCSharp</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,7 +41,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="communication\sc_event_finder.cs" />
+    <Compile Include="communication\sc_interface.cs" />
+    <Compile Include="communication\sc_mutex.cs" />
+    <Compile Include="communication\sc_mutex_if.cs" />
+    <Compile Include="communication\sc_port.cs" />
+    <Compile Include="communication\sc_port_base.cs" />
+    <Compile Include="communication\sc_prim_channel.cs" />
+    <Compile Include="communication\sc_prim_channel_registry.cs" />
+    <Compile Include="communication\sc_signal_ifs.cs" />
+    <Compile Include="communication\sc_writer_policy.cs" />
     <Compile Include="datatypes\bit\sc_bit.cs" />
+    <Compile Include="datatypes\bit\sc_bit_ids.cs" />
     <Compile Include="datatypes\bit\sc_logic.cs" />
     <Compile Include="datatypes\misc\sc_value_base.cs" />
     <Compile Include="kernel\sc_attribute.cs" />
@@ -63,6 +75,7 @@
     <Compile Include="kernel\sc_phase_callback_registry.cs" />
     <Compile Include="kernel\sc_process.cs" />
     <Compile Include="kernel\sc_process_handle.cs" />
+    <Compile Include="kernel\sc_reset.cs" />
     <Compile Include="kernel\sc_runnable.cs" />
     <Compile Include="kernel\sc_simcontext.cs" />
     <Compile Include="kernel\sc_spawn_options.cs" />
@@ -79,6 +92,7 @@
     </Compile>
     <Compile Include="utils\sc_report_handler.cs" />
     <Compile Include="utils\sc_stop_here.cs" />
+    <Compile Include="communication\sc_host_mutex.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="datatypes\fx\" />

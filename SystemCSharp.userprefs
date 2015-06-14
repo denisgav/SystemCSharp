@@ -1,0 +1,20 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="SystemCSharp/kernel/sc_reset.cs">
+    <Files>
+      <File FileName="SystemCSharp/communication/sc_mutex.cs" Line="28" Column="47" />
+      <File FileName="SystemCSharp/communication/sc_mutex_if.cs" Line="1" Column="1" />
+      <File FileName="SystemCSharp/communication/sc_interface.cs" Line="30" Column="5" />
+      <File FileName="SystemCSharp/communication/sc_port.cs" Line="6" Column="15" />
+      <File FileName="SystemCSharp/communication/sc_host_mutex.cs" Line="57" Column="14" />
+      <File FileName="SystemCSharp/kernel/sc_simcontext.cs" Line="1562" Column="25" />
+      <File FileName="SystemCSharp/communication/sc_port_base.cs" Line="277" Column="9" />
+      <File FileName="SystemCSharp/communication/sc_prim_channel_registry.cs" Line="276" Column="47" />
+      <File FileName="SystemCSharp/kernel/sc_reset.cs" Line="243" Column="51" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

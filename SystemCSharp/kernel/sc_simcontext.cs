@@ -191,9 +191,9 @@ namespace sc_core
             m_object_manager = new sc_object_manager();
             m_module_registry = new sc_module_registry(this);
             //---------------------------------------------------------------------------------------
-            //m_port_registry = new sc_port_registry(this);
+            m_port_registry = new sc_port_registry(this);
             //m_export_registry = new sc_export_registry(this);
-            //m_prim_channel_registry = new sc_prim_channel_registry(this);
+            m_prim_channel_registry = new sc_prim_channel_registry(this);
             //---------------------------------------------------------------------------------------
             m_phase_cb_registry = new sc_phase_callback_registry(this);
             m_name_gen = new sc_name_gen();
@@ -282,11 +282,11 @@ namespace sc_core
         {
             m_object_manager = null;
             m_module_registry = null;
+			m_port_registry = null;
+			m_prim_channel_registry = null;
             //-----------------------------------------------------------------------
             /*
-            m_port_registry = 0;
             m_export_registry = 0;
-            m_prim_channel_registry = 0;
             */
             //-----------------------------------------------------------------------
             m_phase_cb_registry = null;
@@ -542,11 +542,11 @@ namespace sc_core
             m_ready_to_simulate = false;
             //------------------------------------------------------------------
             // \/\/\/\/\\\/\/\\/\/\/\\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\\/\/\/\/\
-            /*
+            
             m_port_registry.simulation_done();
-            m_export_registry.simulation_done();
+            //m_export_registry.simulation_done();
             m_prim_channel_registry.simulation_done();
-            */
+            
             // \/\/\/\/\\\/\/\\/\/\/\\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\\/\/\/\/\
             //------------------------------------------------------------------
             m_module_registry.simulation_done();
@@ -643,24 +643,28 @@ namespace sc_core
         {
             return m_module_registry;
         }
-        //---------------------------------------------------------------
-        // \/\/\/\/\\\/\/\\/\/\/\\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\\/\/\/\/\
-        /*
+        
+        
         public sc_port_registry get_port_registry()
         {
             return m_port_registry;
         }
+		//---------------------------------------------------------------
+		// \/\/\/\/\\\/\/\\/\/\/\\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\\/\/\/\/\
+		/*
         public sc_export_registry get_export_registry()
         {
             return m_export_registry;
         }
+        */
+		// \/\/\/\/\\\/\/\\/\/\/\\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\\/\/\/\/\
+		//------------------------------------------------------------------
         public sc_prim_channel_registry get_prim_channel_registry()
         {
             return m_prim_channel_registry;
         }
-        */
-        // \/\/\/\/\\\/\/\\/\/\/\\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\\/\/\/\/\
-        //------------------------------------------------------------------
+        
+        
 
         // to generate unique names for objects in an MT-Safe way
 
@@ -953,13 +957,13 @@ namespace sc_core
 
             //------------------------------------------------------------------
             // \/\/\/\/\\\/\/\\/\/\/\\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\\/\/\/\/\
-            /*
+            
             m_port_registry.elaboration_done();
-            m_export_registry.elaboration_done();
+            //m_export_registry.elaboration_done();
             m_prim_channel_registry.elaboration_done();
             
-            sc_reset.reconcile_resets();
-            */
+            //sc_reset.reconcile_resets();
+            
             // \/\/\/\/\\\/\/\\/\/\/\\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\\/\/\/\/\
             //------------------------------------------------------------------
 
@@ -998,12 +1002,12 @@ namespace sc_core
             m_simulation_status = sc_status.SC_START_OF_SIMULATION;
             //------------------------------------------------------------------
             // \/\/\/\/\\\/\/\\/\/\/\\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\\/\/\/\/\
-            /*
+            
             m_port_registry.start_simulation();
-            m_export_registry.start_simulation();
+            //m_export_registry.start_simulation();
             m_prim_channel_registry.start_simulation();
             m_module_registry.start_simulation();
-            */
+            
             // \/\/\/\/\\\/\/\\/\/\/\\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\\/\/\/\/\
             //------------------------------------------------------------------
 
@@ -1553,9 +1557,9 @@ namespace sc_core
         private sc_module_registry m_module_registry;
         //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
         //---------------------------------------------------------------------------------
-        //private sc_port_registry m_port_registry;
+        private sc_port_registry m_port_registry;
         //private sc_export_registry m_export_registry;
-        //private sc_prim_channel_registry m_prim_channel_registry;
+        private sc_prim_channel_registry m_prim_channel_registry;
         //---------------------------------------------------------------------------------
         //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
         public sc_phase_callback_registry m_phase_cb_registry;

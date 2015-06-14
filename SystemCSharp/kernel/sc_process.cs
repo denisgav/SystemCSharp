@@ -199,9 +199,7 @@ namespace sc_core
             m_name_gen_p = null;
             m_process_kind = sc_curr_proc_kind.SC_NO_PROC_;
             m_references_n = 1;
-            //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-            //m_resets = new List();
-            //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+            m_resets = new List<sc_reset>();
             m_reset_event_p = null;
             m_resume_event_p = null;
             m_runnable_p = null;
@@ -348,21 +346,21 @@ namespace sc_core
         }
 
 
-        protected bool is_disabled()
+        public bool is_disabled()
         {
             return (m_state & (int)process_state.ps_bit_disabled) != 0;
         }
 
-        protected bool is_runnable()
+        public bool is_runnable()
         {
             return m_runnable_p != null;
         }
 
-        protected static sc_process_b last_created_process_base()
+        public static sc_process_b last_created_process_base()
         {
             return m_last_created_process_p;
         }
-        protected override bool remove_child_object(sc_object object_p)
+        public override bool remove_child_object(sc_object object_p)
         {
             if (base.remove_child_object(object_p))
             {
@@ -518,15 +516,11 @@ namespace sc_core
 
             remove_dynamic_events();
             remove_static_events();
-            //---------------------------------------------------------------------------------
-            //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-            /*
-            for (List<sc_reset>.size_type rst_i = 0; rst_i < m_resets.Count; rst_i++)
+            foreach (sc_reset rst_i in m_resets)
             {
-                m_resets[rst_i].remove_process(this);
+                rst_i.remove_process(this);
             }
-            m_resets.resize(0);
-            */
+            m_resets.Clear();
             //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
             //---------------------------------------------------------------------------------
 
@@ -548,7 +542,7 @@ namespace sc_core
         }
 
         public abstract void enable_process(sc_descendant_inclusion_info descendants);
-        protected void initially_in_reset(bool async)
+        public void initially_in_reset(bool async)
         {
             if (async)
                 m_active_areset_n++;
@@ -810,16 +804,14 @@ namespace sc_core
         protected sc_event_list m_event_list_p; // event list waiting on.
         protected sc_process_b m_exist_p; // process existence link.
         protected bool m_free_host; // free sc_semantic_host_p.
-        protected bool m_has_reset_signal; // has reset_signal_is.
+        public bool m_has_reset_signal; // has reset_signal_is.
         protected bool m_has_stack; // true is stack present.
         protected bool m_is_thread; // true if this is thread.
         protected sc_report m_last_report_p; // last report this process.
         protected sc_name_gen m_name_gen_p; // subprocess name generator
         protected sc_curr_proc_kind m_process_kind; // type of process.
         protected int m_references_n; // outstanding handles.
-        //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-        //protected List<sc_reset> m_resets = new List<sc_reset>(); // resets for process.
-        //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        public List<sc_reset> m_resets = new List<sc_reset>(); // resets for process.
         protected sc_event m_reset_event_p; // reset event.
         protected sc_event m_resume_event_p; // resume event.
         protected sc_process_b m_runnable_p; // sc_runnable link

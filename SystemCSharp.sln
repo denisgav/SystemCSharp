@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C# Express 2010
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemCSharp", "SystemCSharp\SystemCSharp.csproj", "{2078EEAA-700C-45EC-BAC3-335348DF3E9A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCS_Example", "SCS_Example\SCS_Example.csproj", "{E12980E4-3D3B-4ED4-A906-7D6AC5EAD3C7}"
@@ -35,6 +35,9 @@ Global
 		{E12980E4-3D3B-4ED4-A906-7D6AC5EAD3C7}.Release|Mixed Platforms.Build.0 = Release|x86
 		{E12980E4-3D3B-4ED4-A906-7D6AC5EAD3C7}.Release|x86.ActiveCfg = Release|x86
 		{E12980E4-3D3B-4ED4-A906-7D6AC5EAD3C7}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = SCS_Example\SCS_Example.csproj
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

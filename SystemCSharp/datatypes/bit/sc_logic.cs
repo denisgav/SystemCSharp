@@ -1,27 +1,6 @@
-/*****************************************************************************
-
-  The following code is derived, directly or indirectly, from the SystemC
-  source code Copyright (c) 1996-2014 by all Contributors.
-  All Rights reserved.
-
-  The contents of this file are subject to the restrictions and limitations
-  set forth in the SystemC Open Source License (the "License");
-  You may not use this file except in compliance with such restrictions and
-  limitations. You may obtain instructions on how to receive a copy of the
-  License at http://www.accellera.org/. Software distributed by Contributors
-  under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
-  ANY KIND, either express or implied. See the License for the specific
-  language governing rights and limitations under the License.
-
- *****************************************************************************/
-
+using sc_core;
 namespace sc_dt
 {
-
-    // classes defined in this module
-    //C++ TO C# CONVERTER NOTE: C# has no need of forward class declarations:
-    //class sc_logic;
-
 
     // ----------------------------------------------------------------------------
     //  ENUM : sc_logic_value_t
@@ -37,147 +16,24 @@ namespace sc_dt
         Log_X
     }
 
-    // ----------------------------------------------------------------------------
-    //  CLASS : sc_logic
-    //
-    //  Four-valued logic type.
-    // ----------------------------------------------------------------------------
-
     public class sc_logic
     {
+        // conversion tables
 
-        public static readonly sc_logic_value_t[] char_to_logic = new sc_logic_value_t[]
-{
-     sc_logic_value_t.Log_0, sc_logic_value_t.Log_1, sc_logic_value_t.Log_Z, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_0, sc_logic_value_t.Log_1, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_Z, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X ,
-     sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_Z, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X 
-};
+        public static readonly sc_logic_value_t[] char_to_logic = { sc_logic_value_t.Log_0, sc_logic_value_t.Log_1, sc_logic_value_t.Log_Z, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_0, sc_logic_value_t.Log_1, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_Z, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_Z, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X };
 
-        public static readonly char[] logic_to_char = new char[] { '0', '1', 'Z', 'X' };
+        public const string logic_to_char = "01ZX";
 
-        public static readonly sc_logic_value_t[][] and_table = new sc_logic_value_t[][]
-{
-    new sc_logic_value_t[] { sc_logic_value_t.Log_0, sc_logic_value_t.Log_0, sc_logic_value_t.Log_0, sc_logic_value_t.Log_0 },
-    new sc_logic_value_t[] { sc_logic_value_t.Log_0, sc_logic_value_t.Log_1, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X },
-    new sc_logic_value_t[] { sc_logic_value_t.Log_0, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X },
-    new sc_logic_value_t[] { sc_logic_value_t.Log_0, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X }
-};
+        public static readonly sc_logic_value_t[,] and_table = { { sc_logic_value_t.Log_0, sc_logic_value_t.Log_0, sc_logic_value_t.Log_0, sc_logic_value_t.Log_0 }, { sc_logic_value_t.Log_0, sc_logic_value_t.Log_1, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X }, { sc_logic_value_t.Log_0, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X }, { sc_logic_value_t.Log_0, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X } };
 
-        public static readonly sc_logic_value_t[][] or_table = new sc_logic_value_t[][]
-{
-    new sc_logic_value_t[] { sc_logic_value_t.Log_0, sc_logic_value_t.Log_1, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X },
-    new sc_logic_value_t[] { sc_logic_value_t.Log_1, sc_logic_value_t.Log_1, sc_logic_value_t.Log_1, sc_logic_value_t.Log_1 },
-    new sc_logic_value_t[] { sc_logic_value_t.Log_X, sc_logic_value_t.Log_1, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X },
-    new sc_logic_value_t[] { sc_logic_value_t.Log_X, sc_logic_value_t.Log_1, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X }
-};
+        public static readonly sc_logic_value_t[,] or_table = { { sc_logic_value_t.Log_0, sc_logic_value_t.Log_1, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X }, { sc_logic_value_t.Log_1, sc_logic_value_t.Log_1, sc_logic_value_t.Log_1, sc_logic_value_t.Log_1 }, { sc_logic_value_t.Log_X, sc_logic_value_t.Log_1, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X }, { sc_logic_value_t.Log_X, sc_logic_value_t.Log_1, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X } };
 
-        public static readonly sc_logic_value_t[][] xor_table = new sc_logic_value_t[][]
-{
-    new sc_logic_value_t[] { sc_logic_value_t.Log_0, sc_logic_value_t.Log_1, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X },
-    new sc_logic_value_t[] { sc_logic_value_t.Log_1, sc_logic_value_t.Log_0, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X },
-    new sc_logic_value_t[] { sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X },
-    new sc_logic_value_t[] { sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X }
-};
+        public static readonly sc_logic_value_t[,] xor_table = { { sc_logic_value_t.Log_0, sc_logic_value_t.Log_1, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X }, { sc_logic_value_t.Log_1, sc_logic_value_t.Log_0, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X }, { sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X }, { sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X } };
 
         public static readonly sc_logic_value_t[] not_table = { sc_logic_value_t.Log_1, sc_logic_value_t.Log_0, sc_logic_value_t.Log_X, sc_logic_value_t.Log_X };
 
-        // support methods
 
-
-        // ----------------------------------------------------------------------------
-        //  CLASS : sc_logic
-        //
-        //  Four-valued logic type.
-        // ----------------------------------------------------------------------------
-
-        // support methods
-
-        private static void invalid_value(sc_logic_value_t v)
-        {
-            string msg = string.Format("sc_logic( {0} )", v);
-            sc_core.sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "value is not valid", msg);
-        }
-        private static void invalid_value(sbyte c)
-        {
-            string msg = string.Format("sc_logic( {0} )", c);
-            sc_core.sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "value is not valid", msg);
-        }
-        private static void invalid_value(int i)
-        {
-            string msg = string.Format("sc_logic( {0} )", i);
-            sc_core.sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "value is not valid", msg);
-        }
-
-        public static sc_logic_value_t to_value(sc_logic_value_t v)
-        {
-            if (v < sc_logic_value_t.Log_0 || v > sc_logic_value_t.Log_X)
-            {
-                invalid_value(v);
-            }
-            return v;
-        }
-
-        public static sc_logic_value_t to_value(bool b)
-        {
-            return (b ? sc_logic_value_t.Log_1 : sc_logic_value_t.Log_0);
-        }
-
-        public static sc_logic_value_t to_value(char c)
-        {
-            sc_logic_value_t v;
-            int index = (int)c;
-            if (index > 127)
-            {
-                invalid_value(c);
-                v = sc_logic_value_t.Log_X;
-            }
-            else
-            {
-                v = char_to_logic[index];
-                if (v < sc_logic_value_t.Log_0 || v > sc_logic_value_t.Log_X)
-                {
-                    invalid_value(c);
-                }
-            }
-            return v;
-        }
-
-        private static sc_logic_value_t to_value(int i)
-        {
-            if (i < 0 || i > 3)
-            {
-                invalid_value(i);
-            }
-            return (sc_logic_value_t)i;
-        }
-
-        private void invalid_01()
-        {
-            if (m_val == sc_logic_value_t.Log_Z)
-            {
-                sc_core.sc_report_handler.report(sc_core.sc_severity.SC_WARNING, "sc_logic value 'Z' cannot be converted to bool", "");
-            }
-            else
-            {
-                sc_core.sc_report_handler.report(sc_core.sc_severity.SC_WARNING, "sc_logic value 'X' cannot be converted to bool", "");
-            }
-        }
-        // conversion tables
-
-
+        private sc_logic_value_t m_val;
 
         // constructors
 
@@ -216,20 +72,117 @@ namespace sc_dt
             m_val = to_value(a.to_bool());
         }
 
-
-        public sc_logic CopyFrom(sc_logic a)
+        public override string ToString()
         {
-            m_val = a.m_val;
+            return string.Format("'{0}'", m_val);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is sc_logic)
+            {
+                sc_logic els = obj as sc_logic;
+                if (els != null)
+                    return m_val.Equals(els.m_val);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_val.GetHashCode();
+        }
+
+        // support methods
+
+        private static void invalid_value(sc_logic_value_t v)
+        {
+            string msg = string.Format("sc_logic( {0} )", v);
+            sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "value is not valid", msg);
+        }
+        private static void invalid_value(sbyte c)
+        {
+            string msg = string.Format("sc_logic( {0} )", c);
+            sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "value is not valid", msg);
+        }
+        private static void invalid_value(int i)
+        {
+            string msg = string.Format("sc_logic( {0} )", i);
+            sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "value is not valid", msg);
+        }
+
+        private static sc_logic_value_t to_value(sc_logic_value_t v)
+        {
+            if (v < sc_logic_value_t.Log_0 || v > sc_logic_value_t.Log_X)
+            {
+                invalid_value(v);
+            }
+            return v;
+        }
+
+        private static sc_logic_value_t to_value(bool b)
+        {
+            return (b ? sc_logic_value_t.Log_1 : sc_logic_value_t.Log_0);
+        }
+
+        private static sc_logic_value_t to_value(sbyte c)
+        {
+            sc_logic_value_t v;
+            uint index = (uint)c;
+            if (index > 127)
+            {
+                invalid_value(c);
+                v = sc_logic_value_t.Log_X;
+            }
+            else
+            {
+                v = sc_logic.char_to_logic[index];
+                if (v < sc_logic_value_t.Log_0 || v > sc_logic_value_t.Log_X)
+                {
+                    invalid_value(c);
+                }
+            }
+            return v;
+        }
+
+        private static sc_logic_value_t to_value(int i)
+        {
+            if (i < 0 || i > 3)
+            {
+                invalid_value(i);
+            }
+            return (sc_logic_value_t)(i);
+        }
+
+        private void invalid_01()
+        {
+            if (m_val == sc_logic_value_t.Log_Z)
+            {
+                sc_report_handler.report(sc_core.sc_severity.SC_WARNING, @"sc_logic value 'Z' cannot be converted to bool", string.Empty);
+            }
+            else
+            {
+                sc_report_handler.report(sc_core.sc_severity.SC_WARNING, @"sc_logic value 'X' cannot be converted to bool", string.Empty);
+            }
+        }
+
+        public sc_logic b_not()
+        {
+            m_val = sc_logic.not_table[value_idx()];
             return this;
         }
 
 
-
+        // explicit conversions
         public sc_logic_value_t value()
         {
             return m_val;
         }
 
+        public int value_idx()
+        {
+            return (int)m_val;
+        }
 
 
         public bool is_01()
@@ -248,18 +201,209 @@ namespace sc_dt
 
         public char to_char()
         {
-            return logic_to_char[(int)m_val];
+            return sc_logic.logic_to_char[value_idx()];
         }
 
 
-        private sc_logic_value_t m_val;
 
+        // destructor
+
+        public void Dispose()
+        {
+        }
+
+
+
+        // ----------------------------------------------------------------------------
+
+        // bitwise operators
+
+        public static sc_logic operator &(sc_logic a, sc_logic b)
+        {
+            return new sc_logic(sc_logic.and_table[a.value_idx(), b.value_idx()]);
+        }
+
+
+        // relational operators and functions
+        public static sc_logic operator &(sc_logic a, sc_logic_value_t b)
+        {
+            return (a & new sc_logic(b));
+        }
+        public static sc_logic operator &(sc_logic_value_t a, sc_logic b)
+        {
+            return (new sc_logic(a) & b);
+        }
+        public static sc_logic operator &(sc_logic a, bool b)
+        {
+            return (a & new sc_logic(b));
+        }
+        public static sc_logic operator &(bool a, sc_logic b)
+        {
+            return (new sc_logic(a) & b);
+        }
+        public static sc_logic operator &(sc_logic a, sbyte b)
+        {
+            return (a & new sc_logic(b));
+        }
+        public static sc_logic operator &(sbyte a, sc_logic b)
+        {
+            return (new sc_logic(a) & b);
+        }
+        public static sc_logic operator &(sc_logic a, int b)
+        {
+            return (a & new sc_logic(b));
+        }
+        public static sc_logic operator &(int a, sc_logic b)
+        {
+            return (new sc_logic(a) & b);
+        }
+        public static sc_logic operator |(sc_logic a, sc_logic b)
+        {
+            return new sc_logic( or_table[a.value_idx(), b.value_idx()]);
+        }
+        public static sc_logic operator |(sc_logic a, sc_logic_value_t b)
+        {
+            return (a | new sc_logic(b));
+        }
+        public static sc_logic operator |(sc_logic_value_t a, sc_logic b)
+        {
+            return (new sc_logic(a) | b);
+        }
+        public static sc_logic operator |(sc_logic a, bool b)
+        {
+            return (a | new sc_logic(b));
+        }
+        public static sc_logic operator |(bool a, sc_logic b)
+        {
+            return (new sc_logic(a) | b);
+        }
+        public static sc_logic operator |(sc_logic a, sbyte b)
+        {
+            return (a | new sc_logic(b));
+        }
+        public static sc_logic operator |(sbyte a, sc_logic b)
+        {
+            return (new sc_logic(a) | b);
+        }
+        public static sc_logic operator |(sc_logic a, int b)
+        {
+            return (a | new sc_logic(b));
+        }
+        public static sc_logic operator |(int a, sc_logic b)
+        {
+            return (new sc_logic(a) | b);
+        }
+
+        public static sc_logic operator ^(sc_logic a, sc_logic b)
+        {
+            return new sc_logic(xor_table[a.value_idx(), b.value_idx()]);
+        }
+
+        public static sc_logic operator ^(sc_logic a, sc_logic_value_t b)
+        {
+            return (a ^ new sc_logic(b));
+        }
+        public static sc_logic operator ^(sc_logic_value_t a, sc_logic b)
+        {
+            return (new sc_logic(a) ^ b);
+        }
+        public static sc_logic operator ^(sc_logic a, bool b)
+        {
+            return (a ^ new sc_logic(b));
+        }
+        public static sc_logic operator ^(bool a, sc_logic b)
+        {
+            return (new sc_logic(a) ^ b);
+        }
+        public static sc_logic operator ^(sc_logic a, sbyte b)
+        {
+            return (a ^ new sc_logic(b));
+        }
+        public static sc_logic operator ^(sbyte a, sc_logic b)
+        {
+            return (new sc_logic(a) ^ b);
+        }
+        public static sc_logic operator ^(sc_logic a, int b)
+        {
+            return (a ^ new sc_logic(b));
+        }
+        public static sc_logic operator ^(int a, sc_logic b)
+        {
+            return (new sc_logic(a) ^ b);
+        }
+
+        // ----------------------------------------------------------------------------
+        public static bool operator ==(sc_logic a, sc_logic_value_t b)
+        {
+            return (a == new sc_logic(b));
+        }
+        public static bool operator ==(sc_logic_value_t a, sc_logic b)
+        {
+            return (new sc_logic(a) == b);
+        }
+        public static bool operator ==(sc_logic a, bool b)
+        {
+            return (a == new sc_logic(b));
+        }
+        public static bool operator ==(bool a, sc_logic b)
+        {
+            return (new sc_logic(a) == b);
+        }
+        public static bool operator ==(sc_logic a, sbyte b)
+        {
+            return (a == new sc_logic(b));
+        }
+        public static bool operator ==(sbyte a, sc_logic b)
+        {
+            return (new sc_logic(a) == b);
+        }
+        public static bool operator ==(sc_logic a, int b)
+        {
+            return (a == new sc_logic(b));
+        }
+        public static bool operator ==(int a, sc_logic b)
+        {
+            return (new sc_logic(a) == b);
+        }
+        public static bool operator !=(sc_logic a, sc_logic_value_t b)
+        {
+            return (a != new sc_logic(b));
+        }
+        public static bool operator !=(sc_logic_value_t a, sc_logic b)
+        {
+            return (new sc_logic(a) != b);
+        }
+        public static bool operator !=(sc_logic a, bool b)
+        {
+            return (a != new sc_logic(b));
+        }
+        public static bool operator !=(bool a, sc_logic b)
+        {
+            return (new sc_logic(a) != b);
+        }
+        public static bool operator !=(sc_logic a, sbyte b)
+        {
+            return (a != new sc_logic(b));
+        }
+        public static bool operator !=(sbyte a, sc_logic b)
+        {
+            return (new sc_logic(a) != b);
+        }
+        public static bool operator !=(sc_logic a, int b)
+        {
+            return (a != new sc_logic(b));
+        }
+        public static bool operator !=(int a, sc_logic b)
+        {
+            return (new sc_logic(a) != b);
+        }
+
+        
+        public sc_logic CopyFrom(sc_logic a)
+        {
+            m_val = a.m_val;
+            return this;
+        }
 
     }
-    // #endif
-
-} // namespace sc_dt
-
-
-
-
+}

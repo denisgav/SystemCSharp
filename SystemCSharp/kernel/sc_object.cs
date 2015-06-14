@@ -301,7 +301,7 @@ namespace sc_core
         // |     object_p -> object to be removed.
         // | Returns true if the object was present, false if not.
         // +----------------------------------------------------------------------------
-        protected virtual bool remove_child_object(sc_object object_p)
+        public virtual bool remove_child_object(sc_object object_p)
         {
             int size = m_child_objects.Count;
             for (int i = 0; i < size; ++i)
