@@ -1,5 +1,23 @@
 //****************************************************************************
 //
+//  The following code is derived, directly or indirectly, from the SystemC
+//  source code Copyright (c) 1996-2014 by all Contributors.
+//  All Rights reserved.
+//
+//  The contents of this file are subject to the restrictions and limitations
+//  set forth in the SystemC Open Source License (the "License");
+//  You may not use this file except in compliance with such restrictions and
+//  limitations. You may obtain instructions on how to receive a copy of the
+//  License at http://www.accellera.org/. Software distributed by Contributors
+//  under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
+//  ANY KIND, either express or implied. See the License for the specific
+//  language governing rights and limitations under the License.
+//
+// ****************************************************************************
+
+
+//****************************************************************************
+//
 //  sc_writer_policy.h -- The sc_signal<T> writer policy definition
 //
 //  Original Author: Philipp A: Hartmann, OFFIS
@@ -17,16 +35,19 @@ namespace sc_core
         SC_UNCHECKED_WRITERS = 3 ///< even allow delta cycle conflicts (non-standard)
     }
 
-    public interface sc_check_write
+    public interface sc_check_update
     {
-        bool check_write(sc_object target, bool value_changed); // value_changed -  target
         void update();
     }
 
-    public interface sc_check_port
+    public interface sc_check_write : sc_check_update
+    {
+        bool check_write(sc_object target, bool value_changed); // value_changed -  target
+    }
+
+    public interface sc_check_port : sc_check_update
     {
         bool check_port(sc_object target, sc_port_base port, bool is_output);
-        void update();
     }
 
 
@@ -139,11 +160,27 @@ namespace sc_core
 		}
     }
 
+    public static class sc_writer_policy_check_creator
+    {
+        public static sc_writer_policy_check CreateWriterPolicyCheck(sc_writer_policy policy, sc_port_base m_output, bool check_delta=true)
+        {
+            switch (policy)
+            {
+                case sc_writer_policy.SC_MANY_WRITERS:
+                    return new sc_writer_policy_check_many_writers(check_delta);
+                case sc_writer_policy.SC_ONE_WRITER:
+                    return new sc_writer_policy_check_one_writer(m_output);
+                default:
+                    return new sc_writer_policy_check_unchecked();
+            }
+        }
+    }
+
 	public class sc_writer_policy_check_one_writer : sc_writer_policy_check
 	{
 		public sc_writer_policy_check_one_writer(sc_port_base m_output)
 		{
-			m_output = null;
+            this.m_output = m_output;
 		}
 		protected sc_port_base m_output;
 

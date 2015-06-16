@@ -49,6 +49,9 @@
     <Compile Include="communication\sc_port_base.cs" />
     <Compile Include="communication\sc_prim_channel.cs" />
     <Compile Include="communication\sc_prim_channel_registry.cs" />
+    <Compile Include="communication\sc_semaphore.cs" />
+    <Compile Include="communication\sc_semaphore_if.cs" />
+    <Compile Include="communication\sc_signal.cs" />
     <Compile Include="communication\sc_signal_ifs.cs" />
     <Compile Include="communication\sc_writer_policy.cs" />
     <Compile Include="datatypes\bit\sc_bit.cs" />

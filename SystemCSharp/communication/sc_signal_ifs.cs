@@ -25,37 +25,16 @@ namespace sc_core
     //  The sc_signal<T> input interface class.
     // ----------------------------------------------------------------------------
 
-    public abstract class sc_signal_in_if_param<T> : sc_interface
+    public interface sc_signal_in_if_param<T> : sc_interface
     {
+        sc_event value_changed_event();
 
-        public abstract sc_event value_changed_event();
+        T read();
 
-
-        public abstract T read();
-
-        public abstract T get_data_ref();
-
+        T get_data_ref();
 
         // was there a value changed event?
-        public abstract bool Event();
-
-
-        // constructor
-
-        protected sc_signal_in_if_param()
-        {
-        }
-
-
-        public virtual void register_port(sc_port_base port_, string if_typename_)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public virtual sc_event default_event()
-        {
-            throw new System.NotImplementedException();
-        }
+        bool Event();
     }
 
 
@@ -65,52 +44,37 @@ namespace sc_core
     //  Specialization of sc_signal_in_if<T> for type bool.
     // ----------------------------------------------------------------------------
 
-    public abstract class sc_signal_in_if : sc_interface
+    public interface sc_signal_in_if : sc_interface
     {
 
         // get the value changed event
-        public abstract sc_event value_changed_event();
+        sc_event value_changed_event();
 
         // get the positive edge event
-        public abstract sc_event posedge_event();
+        sc_event posedge_event();
 
         // get the negative edge event
-        public abstract sc_event negedge_event();
+        sc_event negedge_event();
 
 
         // read the current value
-        public abstract bool read();
+        bool read();
 
         // get a reference to the current value (for tracing)
-        public abstract bool get_data_ref();
+        bool get_data_ref();
 
 
         // was there a value changed event?
-        public abstract bool Event();
+        bool Event();
 
         // was there a positive edge event?
-        public abstract bool posedge();
+        bool posedge();
 
         // was there a negative edge event?
-        public abstract bool negedge();
-
-
-        // constructor
-
-        protected sc_signal_in_if()
-        {
-        }
-
+        bool negedge();
 
         // designate this object as a reset signal
-        public virtual sc_reset is_reset()
-        {
-            return null;
-        }
-
-        public abstract void register_port(sc_port_base port_, string if_typename_);
-
-        public abstract sc_event default_event();
+        sc_reset is_reset();
     }
 
 
@@ -120,22 +84,12 @@ namespace sc_core
     //
     //  The standard output interface class.
     // ----------------------------------------------------------------------------
-    public abstract class sc_signal_write_if<T> : sc_interface
+    public interface sc_signal_write_if<T> : sc_interface
     {
-        public sc_signal_write_if()
-        {
-        }
         // write the new value
-        public abstract void write(T NamelessParameter);
+        void write(T value);
 
-        public virtual sc_writer_policy get_writer_policy()
-        {
-            return sc_writer_policy.SC_UNCHECKED_WRITERS;
-        }
-
-        public abstract void register_port(sc_port_base port_, string if_typename_);
-
-        public abstract sc_event default_event();
+        sc_writer_policy get_writer_policy();
     }
 
 
@@ -144,21 +98,10 @@ namespace sc_core
     //
     //  The sc_signal<T> input/output interface class.
     // ----------------------------------------------------------------------------
-    /*
-    public class sc_signal_inout_if<T> : sc_signal_in_if_param<T>, sc_signal_write_if<T>
+
+    public interface sc_signal_inout_if<T> : sc_signal_in_if_param<T>, sc_signal_write_if<T>
     {
-
-
-        // constructor
-
-        protected sc_signal_inout_if()
-        {
-        }
-
-
-
     }
-    */
+
 
 } // namespace sc_core
-
