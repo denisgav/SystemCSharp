@@ -81,6 +81,7 @@
     <Compile Include="kernel\sc_reset.cs" />
     <Compile Include="kernel\sc_runnable.cs" />
     <Compile Include="kernel\sc_simcontext.cs" />
+    <Compile Include="kernel\sc_spawn.cs" />
     <Compile Include="kernel\sc_spawn_options.cs" />
     <Compile Include="kernel\sc_status.cs" />
     <Compile Include="kernel\sc_thread_process.cs" />

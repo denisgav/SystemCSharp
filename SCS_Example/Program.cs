@@ -15,10 +15,9 @@ namespace SCS_Example
 
         public class my_process1 : sc_process_call_base
         {
-            public override void invoke(sc_process_host host_p)
+            public virtual void invoke(sc_process_host host_p)
             {
                 step();
-                base.invoke(host_p);
             }
             void step()
             {
@@ -28,13 +27,12 @@ namespace SCS_Example
 
         public class my_thread1 : sc_process_call_base
         {
-            public override void invoke(sc_process_host host_p)
+            public virtual void invoke(sc_process_host host_p)
             {
                 for (int i = 0; i < 3; i++)
                 {
                     step();
                 }
-                base.invoke(host_p);
             }
             void step()
             {
@@ -49,13 +47,12 @@ namespace SCS_Example
 
         public class my_thread2 : sc_process_call_base
         {
-            public override void invoke(sc_process_host host_p)
+            public virtual void invoke(sc_process_host host_p)
             {
                 for (int i = 0; i < 5; i++)
                 {
                     step();
                 }
-                base.invoke(host_p);
             }
             void step()
             {

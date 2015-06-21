@@ -78,41 +78,51 @@ namespace sc_core
         }
     }
 
-    public class sc_process_call_base
+    public interface sc_process_call_base
     {
-        public sc_process_call_base()
-        {
-        }
-
-        public virtual void Dispose()
-        {
-        }
-
-        public virtual void invoke(sc_process_host host_p)
-        {
-        }
+        void invoke(sc_process_host host_p);
     }
 
-    public class sc_process_call<T> : sc_process_call_base
+    public class sc_process_call<TResult> : sc_process_call_base
     {
-        public delegate void method_pDelegate();
-        public sc_process_call(method_pDelegate method_p)
+        public sc_process_call(Func<TResult> method_p)
             : base()
         {
             this.m_method_p = method_p;
         }
 
-        public override void Dispose()
+        public virtual void Dispose()
         {
-            base.Dispose();
+
         }
 
-        public override void invoke(sc_process_host host_p)
+        public virtual void invoke(sc_process_host host_p)
         {
             m_method_p();
         }
 
-        protected method_pDelegate m_method_p;
+        protected Func<TResult> m_method_p;
+    }
+
+    public class sc_process_call : sc_process_call_base
+    {
+        public sc_process_call(Action method_p)
+            : base()
+        {
+            this.m_method_p = method_p;
+        }
+
+        public virtual void Dispose()
+        {
+            
+        }
+
+        public virtual void invoke(sc_process_host host_p)
+        {
+            m_method_p();
+        }
+
+        protected Action m_method_p;
     }
     
     public enum process_throw_type
