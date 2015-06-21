@@ -109,7 +109,7 @@ namespace sc_core
 
         // the update method (does nothing by default)
 
-        protected virtual void update()
+        public virtual void update()
         {
         }
 
@@ -117,7 +117,7 @@ namespace sc_core
 
         // called by construction_done (does nothing by default)
 
-        protected virtual void before_end_of_elaboration()
+        public virtual void before_end_of_elaboration()
         {
         }
 
@@ -125,7 +125,7 @@ namespace sc_core
 
         // called by elaboration_done (does nothing by default)
 
-        protected virtual void end_of_elaboration()
+        public virtual void end_of_elaboration()
         {
         }
 
@@ -133,7 +133,7 @@ namespace sc_core
 
         // called by start_simulation (does nothing)
 
-        protected virtual void start_of_simulation()
+        public virtual void start_of_simulation()
         {
         }
 
@@ -141,7 +141,7 @@ namespace sc_core
 
         // called by simulation_done (does nothing)
 
-        protected virtual void end_of_simulation()
+        public virtual void end_of_simulation()
         {
         }
 

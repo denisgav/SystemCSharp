@@ -24,36 +24,35 @@ namespace sc_core
     {
         protected List<sc_spawn_reset_base> resets_n = new List<sc_spawn_reset_base>(); // number of reset specifications to process.
 
-        /*
+        
         public sc_spawn_options()
         {
             m_dont_initialize = false;
             m_resets = new List<sc_spawn_reset_base>();
-            m_sensitive_events = new List();
-            m_sensitive_event_finders = new List();
-            m_sensitive_interfaces = new List();
-            m_sensitive_port_bases = new List();
+            m_sensitive_events = new List<sc_event>();
+            m_sensitive_event_finders = new List<sc_event_finder>();
+            m_sensitive_interfaces = new List<sc_interface>();
+            m_sensitive_port_bases = new List<sc_port_base>();
             m_spawn_method = false;
             m_stack_size = 0;
-            resets_n = m_resets.size();
-            for (List<sc_spawn_reset_base*>.size_type reset_i = 0; reset_i < resets_n; reset_i++)
-                m_resets[reset_i].specify_reset();
+            resets_n = new List<sc_spawn_reset_base>();
+            foreach (sc_spawn_reset_base reset_i in m_resets)
+                reset_i.specify_reset();
         }
-        */
+        
 
         // +======================================================================
         // | CLASS sc_spawn_options (implementation)
         // |
         // +======================================================================
-        /*
+        
         public void Dispose()
         {
-            List<sc_spawn_reset_base*>.size_type resets_n = m_resets.Count;
-            for (List<sc_spawn_reset_base*>.size_type reset_i = 0; reset_i < resets_n; reset_i++)
-                if (m_resets[reset_i] != null)
-                    m_resets[reset_i].Dispose();
+            foreach(sc_spawn_reset_base resets_i in m_resets)
+                if (resets_i != null)
+                    resets_i.Dispose();
         }
-
+        /*
         public void async_reset_signal_is(sc_in<bool> port, bool level)
         {
             m_resets.Add(new sc_spawn_reset<sc_in<bool>>(true, port, level));
@@ -66,11 +65,13 @@ namespace sc_core
         {
             m_resets.Add(new sc_spawn_reset<sc_out<bool>>(true, port, level));
         }
+        */
         public void async_reset_signal_is(sc_signal_in_if<bool> port, bool level)
         {
             m_resets.Add(new sc_spawn_reset<sc_signal_in_if<bool>>(true, port, level));
         }
 
+        /*
         public void reset_signal_is(sc_in<bool> port, bool level)
         {
             m_resets.Add(new sc_spawn_reset<sc_in<bool>>(false, port, level));
@@ -83,18 +84,17 @@ namespace sc_core
         {
             m_resets.Add(new sc_spawn_reset<sc_out<bool>>(false, port, level));
         }
+        */
         public void reset_signal_is(sc_signal_in_if<bool> port, bool level)
         {
             m_resets.Add(new sc_spawn_reset<sc_signal_in_if<bool>>(false, port, level));
         }
-        */
+        
         public void dont_initialize()
         {
             m_dont_initialize = true;
         }
 
-        //C++ TO C# CONVERTER WARNING: 'const' methods are not available in C#:
-        //ORIGINAL LINE: bool is_method() const
         public bool is_method()
         {
             return m_spawn_method;
@@ -110,7 +110,7 @@ namespace sc_core
             m_sensitive_events.Add(e);
         }
 
-        /*
+        
         public void set_sensitivity(sc_port_base port_base)
         {
             m_sensitive_port_bases.Add(port_base);
@@ -121,16 +121,18 @@ namespace sc_core
             m_sensitive_interfaces.Add(interface_p);
         }
 
-        public void set_sensitivity(sc_export_base export_base)
-        {
-            m_sensitive_interfaces.Add(export_base.get_interface());
-        }
+        //\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/
+        //public void set_sensitivity(sc_export_base export_base)
+        //{
+        //    m_sensitive_interfaces.Add(export_base.get_interface());
+        //}
+        //\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/
 
         public void set_sensitivity(sc_event_finder event_finder)
         {
             m_sensitive_event_finders.Add(event_finder);
         }
-        */
+        
         public void spawn_method()
         {
             m_spawn_method = true;
@@ -142,9 +144,9 @@ namespace sc_core
         public bool m_dont_initialize;
         public List<sc_spawn_reset_base> m_resets = new List<sc_spawn_reset_base>();
         public List<sc_event> m_sensitive_events = new List<sc_event>();
-        //protected List<sc_event_finder> m_sensitive_event_finders = new List<sc_event_finder>();
-        //protected List<sc_interface> m_sensitive_interfaces = new List<sc_interface>();
-        //protected List<sc_port_base> m_sensitive_port_bases = new List<sc_port_base>();
+        protected List<sc_event_finder> m_sensitive_event_finders = new List<sc_event_finder>();
+        protected List<sc_interface> m_sensitive_interfaces = new List<sc_interface>();
+        protected List<sc_port_base> m_sensitive_port_bases = new List<sc_port_base>();
         public bool m_spawn_method; // Method not thread.
         public uint m_stack_size; // Thread stack size.
     }
@@ -162,6 +164,7 @@ namespace sc_core
             m_level = level;
         }
         public abstract void specify_reset();
+        public virtual void Dispose() { }
 
         protected bool m_async; // = true if async reset.
         protected bool m_level; // level indicating reset.
@@ -171,7 +174,7 @@ namespace sc_core
     // | CLASS sc_spawn_reset<SOURCE>
     // |  - Reset specification for sc_spawn_options.
     // +======================================================================
-    public class sc_spawn_reset<SOURCE> : sc_spawn_reset_base
+    public class sc_spawn_reset<SOURCE> : sc_spawn_reset_base where SOURCE:sc_signal_in_if<bool>
     {
         public sc_spawn_reset(bool async, SOURCE source, bool level)
             : base(async, level)
@@ -180,7 +183,7 @@ namespace sc_core
         }
         public override void specify_reset()
         {
-            //sc_reset.reset_signal_is(m_async, m_source, m_level);
+            sc_reset.reset_signal_is(m_async, m_source, m_level);
         }
 
         protected readonly SOURCE m_source; // source of reset signal.

@@ -53,10 +53,10 @@ namespace sc_core
         // Notes:
         //   (1) If reset is asserted we tell the process that it is in reset.
         //------------------------------------------------------------------------------
-        /*
+        
         protected static void reconcile_resets()
         {
-            sc_signal_in_if_param<bool> iface_p; // Interface to reset signal.
+            sc_signal_in_if<bool> iface_p; // Interface to reset signal.
             sc_reset_finder next_p; // Next finder to process.
             sc_reset_finder now_p; // Finder currently processing.
             sc_reset_target reset_target = new sc_reset_target(); // Target's reset entry.
@@ -67,15 +67,15 @@ namespace sc_core
                 next_p = now_p.m_next_p;
                 if (now_p.m_in_p != null)
                 {
-                    iface_p = now_p.m_in_p.get_interface() as sc_signal_in_if_param<bool>;
+                    iface_p = now_p.m_in_p.get_interface() as sc_signal_in_if<bool>;
                 }
                 else if (now_p.m_inout_p != null)
                 {
-                    iface_p = now_p.m_inout_p.get_interface() as sc_signal_in_if_param<bool>;
+                    iface_p = now_p.m_inout_p.get_interface() as sc_signal_in_if<bool>;
                 }
                 else
                 {
-                    iface_p = now_p.m_out_p.get_interface() as sc_signal_in_if_param<bool>;
+                    iface_p = now_p.m_out_p.get_interface() as sc_signal_in_if<bool>;
                 }
                 Debug.Assert(iface_p != null);
                 reset_p = iface_p.is_reset();
@@ -90,8 +90,8 @@ namespace sc_core
                     now_p.Dispose();
             }
         }
-        */
-		/*
+        
+		
         //------------------------------------------------------------------------------
         //"sc_reset::reset_signal_is - ports"
         //
@@ -108,8 +108,8 @@ namespace sc_core
         //------------------------------------------------------------------------------
         protected static void reset_signal_is(bool async, sc_in<bool> port, bool level)
         {
-            sc_signal_in_if_param<bool> iface_p;
-            sc_process_handle process_p = (sc_process_b)sc_simcontext.sc_get_current_process_handle();
+            sc_signal_in_if<bool> iface_p;
+            sc_process_handle process_p = sc_simcontext.sc_get_current_process_handle();
 
             Debug.Assert(process_p != null);
             process_p.m_has_reset_signal = true;
@@ -118,11 +118,11 @@ namespace sc_core
                 case sc_curr_proc_kind.SC_THREAD_PROC_:
                 case sc_curr_proc_kind.SC_METHOD_PROC_:
                 case sc_curr_proc_kind.SC_CTHREAD_PROC_:
-                    iface_p = port.get_interface() as sc_signal_in_if_param<bool>;
+                    iface_p = port.get_interface() as sc_signal_in_if<bool>;
                     if (iface_p != null)
                         reset_signal_is(async, iface_p, level);
                     else
-                        new sc_reset_finder(async, port, level, process_p);
+                        new sc_reset_finder(async, port, level, process_p.m_target_p);
                     break;
                 default:
                     sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "Unknown process type", process_p.name());
@@ -131,8 +131,8 @@ namespace sc_core
         }
         protected static void reset_signal_is(bool async, sc_inout<bool> port, bool level)
         {
-            sc_signal_in_if_param<bool> iface_p;
-            sc_process_handle process_p = (sc_process_b)GlobalMembersSc_simcontext.sc_get_current_process_handle();
+            sc_signal_in_if<bool> iface_p;
+            sc_process_handle process_p = sc_simcontext.sc_get_current_process_handle();
 
             Debug.Assert(process_p != null);
             process_p.m_has_reset_signal = true;
@@ -141,11 +141,11 @@ namespace sc_core
                 case sc_curr_proc_kind.SC_THREAD_PROC_:
                 case sc_curr_proc_kind.SC_METHOD_PROC_:
                 case sc_curr_proc_kind.SC_CTHREAD_PROC_:
-                    iface_p = port.get_interface() as sc_signal_in_if_param<bool>;
+                    iface_p = port.get_interface() as sc_signal_in_if<bool>;
                     if (iface_p != null)
                         reset_signal_is(async, iface_p, level);
                     else
-                        new sc_reset_finder(async, port, level, process_p);
+                        new sc_reset_finder(async, port, level, process_p.m_target_p);
                     break;
                 default:
                     sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "Unknown process type", process_p.name());
@@ -154,8 +154,8 @@ namespace sc_core
         }
         protected static void reset_signal_is(bool async, sc_out<bool> port, bool level)
         {
-            sc_signal_in_if_param<bool> iface_p;
-            sc_process_handle process_p = (sc_process_b)sc_simcontext.sc_get_current_process_handle();
+            sc_signal_in_if<bool> iface_p;
+            sc_process_handle process_p = sc_simcontext.sc_get_current_process_handle();
 
             Debug.Assert(process_p != null);
             process_p.m_has_reset_signal = true;
@@ -164,18 +164,18 @@ namespace sc_core
                 case sc_curr_proc_kind.SC_THREAD_PROC_:
                 case sc_curr_proc_kind.SC_METHOD_PROC_:
                 case sc_curr_proc_kind.SC_CTHREAD_PROC_:
-                    iface_p = port.get_interface() as sc_signal_in_if_param<bool>;
+                    iface_p = port.get_interface() as sc_signal_in_if<bool>;
                     if (iface_p != null)
                         reset_signal_is(async, iface_p, level);
                     else
-                        new sc_reset_finder(async, port, level, process_p);
+                        new sc_reset_finder(async, port, level, process_p.m_target_p);
                     break;
                 default:
                     sc_report_handler.report(sc_core.sc_severity.SC_ERROR, "Unknown process type", process_p.name());
                     break;
             }
         }
-		*/
+		
         //------------------------------------------------------------------------------
         //"sc_reset::reset_signal_is"
         //
@@ -194,14 +194,12 @@ namespace sc_core
         //   (1) If reset is asserted we tell the process that it is in reset
         //       initially.
         //------------------------------------------------------------------------------
-        protected static void reset_signal_is(bool async, sc_signal_in_if_param<bool> iface, bool level)
+        public static void reset_signal_is(bool async, sc_signal_in_if<bool> iface, bool level)
         {
             sc_process_b process_p;
 
             sc_reset_target reset_target = new sc_reset_target(); // entry to build for the process.
-            ///*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
-            //sc_reset reset_p; // reset object.
-            ///*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
+            sc_reset reset_p; // reset object.
 
             process_p = sc_process_b.last_created_process_base();
             Debug.Assert(process_p != null);
@@ -211,16 +209,14 @@ namespace sc_core
                 case sc_curr_proc_kind.SC_METHOD_PROC_:
                 case sc_curr_proc_kind.SC_CTHREAD_PROC_:
                 case sc_curr_proc_kind.SC_THREAD_PROC_:
-                    ///*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
-                    //reset_p = iface.is_reset();
-                    //process_p.m_resets.Add(reset_p);
-                    ///*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
+                    reset_p = iface.is_reset();
+                    process_p.m_resets.Add(reset_p);
+
                     reset_target.m_async = async;
                     reset_target.m_level = level;
                     reset_target.m_process_p = process_p;
-                    ///*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
-                    //reset_p.m_targets.Add(reset_target);
-                    ///*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
+                    
+                    reset_p.m_targets.Add(reset_target);
                     if (iface.read() == level)
                         process_p.initially_in_reset(async);
                     break;
@@ -230,7 +226,7 @@ namespace sc_core
             }
         }
 
-        protected sc_reset(sc_signal_in_if_param<bool> iface_p)
+        protected sc_reset(sc_signal_in_if<bool> iface_p)
         {
             m_iface_p = iface_p;
             m_targets = new List<sc_reset_target>();
@@ -273,7 +269,7 @@ namespace sc_core
             }
         }
 
-        protected readonly sc_signal_in_if_param<bool> m_iface_p; // Interface to read.
+        protected readonly sc_signal_in_if<bool> m_iface_p; // Interface to read.
         protected List<sc_reset_target> m_targets = new List<sc_reset_target>(); // List of processes to reset.
 
     }
@@ -287,40 +283,42 @@ namespace sc_core
     //==============================================================================
     public class sc_reset_finder
     {
-        //public sc_reset_finder(bool async, sc_in<bool> port_p, bool level, sc_process_b target_p)
-        //{
-        //    m_async = async;
-        //    m_level = level;
-        //    m_next_p = null;
-        //    m_in_p = port_p;
-        //    m_inout_p = 0;
-        //    m_out_p = 0;
-        //    m_target_p = target_p;
-        //
-        //    m_next_p = reset_finder_q;
-        //    reset_finder_q = this;
-        //}
-        //public sc_reset_finder(bool async, sc_inout<bool> port_p, bool level, sc_process_b target_p)
-        //{
-        //    m_async = async;
-        //    m_level = level;
-        //    m_next_p = 0;
-        //    m_in_p = 0;
-        //    m_inout_p = port_p;
-        //    m_out_p = 0;
-        //    m_target_p = target_p;
-        //
-        //    m_next_p = sc_reset.reset_finder_q;
-        //    sc_reset.reset_finder_q = this;
-        //}
+        public sc_reset_finder(bool async, sc_in<bool> port_p, bool level, sc_process_b target_p)
+        {
+            m_async = async;
+            m_level = level;
+            m_next_p = null;
+            m_in_p = port_p;
+            m_inout_p = null;
+            m_out_p = null;
+            m_target_p = target_p;
+
+            m_next_p = sc_reset.reset_finder_q;
+            sc_reset.reset_finder_q = this;
+        }
+        public sc_reset_finder(bool async, sc_inout<bool> port_p, bool level, sc_process_b target_p)
+        {
+            m_async = async;
+            m_level = level;
+            m_next_p = null;
+            m_in_p = null;
+            m_inout_p = port_p;
+            m_out_p = null;
+            m_target_p = target_p;
+        
+            m_next_p = sc_reset.reset_finder_q;
+            sc_reset.reset_finder_q = this;
+        }
+
+        public virtual void Dispose() { }
 
         public bool m_async; // True if asynchronous reset.
         public bool m_level; // Level for reset.
         public sc_reset_finder m_next_p; // Next reset finder in list.
 		
-        //sc_in<bool> m_in_p; // Port for which reset is needed.
-        //sc_inout<bool> m_inout_p; // Port for which reset is needed.
-        //sc_out<bool> m_out_p; // Port for which reset is needed.
+        public sc_in<bool> m_in_p; // Port for which reset is needed.
+        public sc_inout<bool> m_inout_p; // Port for which reset is needed.
+        public sc_out<bool> m_out_p; // Port for which reset is needed.
 
         public sc_process_b m_target_p;
     }

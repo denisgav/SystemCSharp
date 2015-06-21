@@ -25,7 +25,7 @@ namespace sc_core
     //  The sc_signal<T> input interface class.
     // ----------------------------------------------------------------------------
 
-    public interface sc_signal_in_if_param<T> : sc_interface
+    public interface sc_signal_in_if<T> : sc_interface
     {
         sc_event value_changed_event();
 
@@ -35,6 +35,8 @@ namespace sc_core
 
         // was there a value changed event?
         bool Event();
+
+        sc_reset is_reset();
     }
 
 
@@ -99,7 +101,7 @@ namespace sc_core
     //  The sc_signal<T> input/output interface class.
     // ----------------------------------------------------------------------------
 
-    public interface sc_signal_inout_if<T> : sc_signal_in_if_param<T>, sc_signal_write_if<T>
+    public interface sc_signal_inout_if<T> : sc_signal_in_if<T>, sc_signal_write_if<T>
     {
     }
 

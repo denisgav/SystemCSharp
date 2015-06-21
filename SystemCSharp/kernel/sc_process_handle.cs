@@ -25,11 +25,13 @@ namespace sc_core
 {
     public class sc_process_handle
     {
-        protected sc_process_b m_target_p;   // Target for this object instance.
+        public sc_process_b m_target_p;   // Target for this object instance.
 
         protected static List<sc_event> empty_event_vector;  // If m_target_p == 0.
         protected static List<sc_object> empty_object_vector; // If m_target_p == 0.
         protected static sc_event non_event;           // If m_target_p == 0.
+
+        public bool m_has_reset_signal = false;
 
         public override bool Equals(object obj)
         {

@@ -159,7 +159,7 @@ namespace sc_core
             return this;
         }
         
-        public sc_signal<T> CopyFrom(sc_signal_in_if_param<T> a)
+        public sc_signal<T> CopyFrom(sc_signal_in_if<T> a)
         {
             write(a.read());
             return this;
@@ -225,12 +225,12 @@ namespace sc_core
             }
         }
 
-        public virtual string print()
+        public override string print()
         {
             return m_cur_val.ToString();
         }
 
-        public virtual string dump()
+        public override string dump()
         {
             StringBuilder res = new StringBuilder();
             res.AppendLine(string.Format("name = {0}", name()));
@@ -240,7 +240,7 @@ namespace sc_core
         }
 
         //ORIGINAL LINE: void sc_signal<T,POL>::update()
-        public virtual void update()
+        public override void update()
         {
             writer_policy_check.update();
             if (!(m_new_val.Equals(m_cur_val)))
@@ -306,6 +306,12 @@ namespace sc_core
         protected T m_cur_val = default(T);
         protected ulong m_change_stamp; // delta of last event
         protected T m_new_val = default(T);
+
+
+        public sc_reset is_reset()
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

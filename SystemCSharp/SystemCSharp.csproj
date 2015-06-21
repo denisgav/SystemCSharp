@@ -53,6 +53,7 @@
     <Compile Include="communication\sc_semaphore_if.cs" />
     <Compile Include="communication\sc_signal.cs" />
     <Compile Include="communication\sc_signal_ifs.cs" />
+    <Compile Include="communication\sc_signal_ports.cs" />
     <Compile Include="communication\sc_writer_policy.cs" />
     <Compile Include="datatypes\bit\sc_bit.cs" />
     <Compile Include="datatypes\bit\sc_bit_ids.cs" />
