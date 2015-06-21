@@ -604,23 +604,17 @@ namespace sc_core
 
         protected void at_negedge(sc_signal_in_if<bool> s)
         {
-    //C++ TO C# CONVERTER WARNING: The following line was determined to be a copy constructor call - this should be verified and a copy constructor should be created if it does not yet exist:
-    //ORIGINAL LINE: TangibleTempGlobal.sc_core::at_negedge(s, simcontext());
             global::sc_core.at_negedge(new sc_signal_in_if(s), simcontext());
         }
 
         protected void at_negedge(sc_signal_in_if<sc_dt.sc_logic> s)
         {
-    //C++ TO C# CONVERTER WARNING: The following line was determined to be a copy constructor call - this should be verified and a copy constructor should be created if it does not yet exist:
-    //ORIGINAL LINE: TangibleTempGlobal.sc_core::at_negedge(s, simcontext());
             global::sc_core.at_negedge(new sc_signal_in_if(s), simcontext());
         }
 
         // Catch uses of watching:
         protected void watching(bool UnnamedParameter1) // expr
             {
-    //C++ TO C# CONVERTER TODO TASK: There is no direct equivalent in C# to the C++ __LINE__ macro:
-    //C++ TO C# CONVERTER TODO TASK: There is no direct equivalent in C# to the C++ __FILE__ macro:
                 global::sc_core.sc_report_handler.report(sc_core.sc_severity.SC_ERROR, SC_ID_WATCHING_NOT_ALLOWED_, "", __FILE__, __LINE__);
             }
         */

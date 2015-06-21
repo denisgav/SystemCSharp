@@ -335,6 +335,13 @@ namespace sc_core
             return "sc_port_base";
         }
 
+		public virtual sc_event_finder pos (){
+			throw new NotImplementedException ();
+		}
+		public virtual sc_event_finder neg (){
+			throw new NotImplementedException ();
+		}
+
 
         // constructors
 
