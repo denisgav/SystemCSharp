@@ -267,6 +267,16 @@ namespace sc_core
             return "sc_clock";
         }
 
+		private sc_clock_posedge_callback get_posedge_callback()
+		{
+			return new sc_clock_posedge_callback (this);
+		}
+
+		private sc_clock_negedge_callback get_negedge_callback()
+		{
+			return new sc_clock_negedge_callback (this);
+		}
+
         public override void before_end_of_elaboration()
         {
             string gen_base;
@@ -279,8 +289,9 @@ namespace sc_core
             gen_base = basename();
             gen_base += "_posedge_action";
             {
-                sc_process_handle result = new sc_process_handle(new sc_spawn_object<sc_clock_posedge_callback>(new sc_clock_posedge_callback(this), sc_simcontext.sc_gen_unique_name(gen_base), posedge_options));
-            };
+				sc_spawn_object<sc_clock_posedge_callback> spawn_data = new sc_spawn_object<sc_clock_posedge_callback> (get_posedge_callback, posedge_options, sc_simcontext.sc_gen_unique_name (gen_base));
+				sc_process_handle result = new sc_process_handle(spawn_data);
+            }
 
             negedge_options.spawn_method();
             negedge_options.dont_initialize();
@@ -288,8 +299,9 @@ namespace sc_core
             gen_base = basename();
             gen_base += "_negedge_action";
             {
-                sc_process_handle result = new sc_process_handle(new sc_spawn_object<sc_clock_negedge_callback>(new sc_clock_negedge_callback(this), sc_simcontext.sc_gen_unique_name(gen_base), negedge_options));
-            };
+				sc_spawn_object<sc_clock_negedge_callback> spawn_data = new sc_spawn_object<sc_clock_negedge_callback> (get_negedge_callback, negedge_options, sc_simcontext.sc_gen_unique_name (gen_base));
+				sc_process_handle result = new sc_process_handle(spawn_data);
+            }
         }
 
         // processes
@@ -412,6 +424,11 @@ namespace sc_core
             m_target_p = target_p;
         }
 
+		public sc_clock get_clock()
+		{
+			return m_target_p;
+		}
+
         protected sc_clock m_target_p;
     }
 
@@ -421,6 +438,12 @@ namespace sc_core
         {
             m_target_p = target_p;
         }
+
+		public sc_clock get_clock()
+		{
+			return m_target_p;
+		}
+
         protected sc_clock m_target_p;
     }
 

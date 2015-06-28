@@ -291,7 +291,7 @@ namespace sc_core
 	}
         */
 
-        protected virtual bool is_clock()
+        public virtual bool is_clock()
         {
             return false;
         }

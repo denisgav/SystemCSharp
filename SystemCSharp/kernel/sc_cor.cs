@@ -268,6 +268,8 @@ namespace sc_core
             // This scheme results in the newly created thread being dormant before
             // the main thread continues execution.
 
+			thread.IsBackground = true;
+
             cor_p.Thread = thread;
             thread.Start(cor_p);
 

@@ -30,22 +30,22 @@ namespace sc_core
     {
         // constructors
 
-        protected sc_in(int max_size_)
+        public sc_in(int max_size_)
             : this(max_size_, sc_port_policy.SC_ONE_OR_MORE_BOUND)
         {
         }
 
-        protected sc_in(int max_size_, sc_port_policy policy)
+		public sc_in(int max_size_, sc_port_policy policy)
             : base(max_size_, policy)
         {
         }
 
-        protected sc_in(string name_, int max_size_)
+		public sc_in(string name_, int max_size_)
             : this(name_, max_size_, sc_port_policy.SC_ONE_OR_MORE_BOUND)
         {
         }
 
-        protected sc_in(string name_, int max_size_, sc_port_policy policy)
+		public sc_in(string name_, int max_size_, sc_port_policy policy)
             : base(name_, max_size_, policy)
         {
         }
@@ -62,22 +62,22 @@ namespace sc_core
     {
         // constructors
 
-        protected sc_inout(int max_size_)
+		public sc_inout(int max_size_)
             : this(max_size_, sc_port_policy.SC_ONE_OR_MORE_BOUND)
         {
         }
 
-        protected sc_inout(int max_size_, sc_port_policy policy)
+		public sc_inout(int max_size_, sc_port_policy policy)
             : base(max_size_, policy)
         {
         }
 
-        protected sc_inout(string name_, int max_size_)
+		public sc_inout(string name_, int max_size_)
             : this(name_, max_size_, sc_port_policy.SC_ONE_OR_MORE_BOUND)
         {
         }
 
-        protected sc_inout(string name_, int max_size_, sc_port_policy policy)
+		public sc_inout(string name_, int max_size_, sc_port_policy policy)
             : base(name_, max_size_, policy)
         {
         }
@@ -94,22 +94,22 @@ namespace sc_core
     {
         // constructors
 
-        protected sc_out(int max_size_)
+		public sc_out(int max_size_)
             : this(max_size_, sc_port_policy.SC_ONE_OR_MORE_BOUND)
         {
         }
 
-        protected sc_out(int max_size_, sc_port_policy policy)
+		public sc_out(int max_size_, sc_port_policy policy)
             : base(max_size_, policy)
         {
         }
 
-        protected sc_out(string name_, int max_size_)
+		public sc_out(string name_, int max_size_)
             : this(name_, max_size_, sc_port_policy.SC_ONE_OR_MORE_BOUND)
         {
         }
 
-        protected sc_out(string name_, int max_size_, sc_port_policy policy)
+		public sc_out(string name_, int max_size_, sc_port_policy policy)
             : base(name_, max_size_, policy)
         {
         }

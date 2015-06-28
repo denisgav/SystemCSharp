@@ -99,6 +99,7 @@
     <Compile Include="utils\sc_report_handler.cs" />
     <Compile Include="utils\sc_stop_here.cs" />
     <Compile Include="communication\sc_host_mutex.cs" />
+    <Compile Include="communication\sc_clock.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="datatypes\fx\" />

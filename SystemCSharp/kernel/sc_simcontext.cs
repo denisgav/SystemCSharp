@@ -524,8 +524,7 @@ namespace sc_core
         {
             if (m_forced_stop)
             {
-
-                //sc_report_handler.report(sc_core.sc_severity.SC_WARNING, "sc_stop has already been called", "");
+                sc_report_handler.report(sc_core.sc_severity.SC_WARNING, "sc_stop has already been called", "");
                 return;
             }
             if (sc_simcontext.stop_mode == sc_stop_mode.SC_STOP_IMMEDIATE)

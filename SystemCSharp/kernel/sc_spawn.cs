@@ -1,3 +1,19 @@
+//****************************************************************************
+//
+//  The following code is derived, directly or indirectly, from the SystemC
+//  source code Copyright (c) 1996-2014 by all Contributors.
+//  All Rights reserved.
+//
+//  The contents of this file are subject to the restrictions and limitations
+//  set forth in the SystemC Open Source License (the "License");
+//  You may not use this file except in compliance with such restrictions and
+//  limitations. You may obtain instructions on how to receive a copy of the
+//  License at http://www.accellera.org/. Software distributed by Contributors
+//  under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
+//  ANY KIND, either express or implied. See the License for the specific
+//  language governing rights and limitations under the License.
+//
+// ****************************************************************************
 
 //------------------------------------------------------------------------------
 //"sc_spawn_object_v - semantic object with return value"
@@ -18,9 +34,9 @@
 using System;
 namespace sc_core
 {
-    public class sc_spawn_object_v<TResult> : sc_process_host
+	public class sc_spawn_object<TResult> : sc_object, sc_process_host
     {
-        public sc_spawn_object_v(Func<TResult> func)
+		public sc_spawn_object(Func<TResult> func, sc_spawn_options options, string name)
         {
             m_func = func;
         }
@@ -157,11 +173,11 @@ namespace sc_core
             public static sc_process_handle sc_spawn(Func<TResult> func, sc_spawn_options opt_p, string name_p)
             {
                 sc_simcontext context_p;
-                sc_spawn_object_v<TResult> spawn_p;
+                sc_spawn_object<TResult> spawn_p;
 
                 context_p = sc_simcontext.sc_get_curr_simcontext();
 
-                spawn_p = new sc_spawn_object_v<TResult>(func);
+				spawn_p = new sc_spawn_object<TResult>(func, opt_p, name_p);
                 if (opt_p == null || !opt_p.is_method())
                 {
                     sc_process_handle thread_handle = context_p.create_thread_process(name_p, true, new sc_process_call<TResult>(spawn_p.m_func), spawn_p, opt_p);
